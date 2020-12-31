@@ -21,7 +21,7 @@ class HelloFeint extends Application {
 		// Render rectangle
 		renderer.drawRect(5, 5, 50, 50, {color: 0xFFFF00FF});
 
-		// Render rectangle
+		// Render text
 		renderer.drawText(60, 5, 'Hello, Feint!', 24, 'sans-serif');
 	}
 
