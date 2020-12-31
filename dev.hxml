@@ -1,0 +1,3 @@
+-p .
+--js bin/feint.js
+--debug
