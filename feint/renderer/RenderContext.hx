@@ -62,7 +62,7 @@ class RenderContext {
 		webContext.fillStyle = colorToRGBA(0xFFFFFFFF);
 		webContext.font = '${fontSize}px ${font}';
 		webContext.textBaseline = 'top';
-		webContext.fillText('Hello world', x, y);
+		webContext.fillText(text, x, y);
 		#else
 		throw new FeintException('NotImplemented', 'Not implemented.');
 		#end
@@ -86,9 +86,9 @@ class RenderContext {
 		// Handle High DPI screens
 		// Fixes font scaling issues on high DPI monitors without changing the actual canvas size
 		webCanvas.width = Math.floor(width * js.Browser.window.devicePixelRatio);
-		webCanvas.height = Math.floor(width * js.Browser.window.devicePixelRatio);
+		webCanvas.height = Math.floor(height * js.Browser.window.devicePixelRatio);
 		webCanvas.style.width = width + 'px';
-		webCanvas.style.height = width + 'px';
+		webCanvas.style.height = height + 'px';
 		webContext.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
 
 		Logger.info('Created RenderContext using ${webAPI} API');

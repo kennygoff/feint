@@ -24,6 +24,7 @@ class Application {
 	public function init() {}
 
 	public function update(elapsed:Float) {
+		window.inputManager.update(elapsed);
 		game.update(elapsed);
 	}
 
@@ -33,6 +34,7 @@ class Application {
 
 	/**
 	 * Initial setup of application window, renderer, and game.
+	 *
 	 * WARNING: Do not override, used internally by Application only.
 	 * @param options ApplicationOptions
 	 */
