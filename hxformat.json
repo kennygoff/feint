@@ -1,0 +1,62 @@
+{
+  "indentation": {
+    "character": "  "
+  },
+  "emptyLines": {
+    "beforeBlocks": "keep",
+    "afterBlocks": "keep",
+    "afterPackage": 1,
+    "importAndUsing": {
+      "betweenImportsLevel": "all"
+    },
+    "maxAnywhereInFile": 1
+  },
+  "whitespace": {
+    "ternaryPolicy": "around"
+  },
+  "wrapping": {
+    "maxLineLength": 100,
+    "functionSignature": {
+      "defaultWrap": "noWrap",
+      "rules": [
+        {
+          "conditions": [
+            {
+              "cond": "lineLength >= n",
+              "value": 100
+            }
+          ],
+          "type": "onePerLine"
+        }
+      ]
+    },
+    "callParameter": {
+      "defaultWrap": "noWrap",
+      "rules": [
+        {
+          "conditions": [
+            {
+              "cond": "lineLength >= n",
+              "value": 100
+            }
+          ],
+          "type": "onePerLine"
+        }
+      ]
+    },
+    "opBoolChain": {
+      "defaultWrap": "noWrap",
+      "rules": [
+        {
+          "conditions": [
+            {
+              "cond": "lineLength >= n",
+              "value": 100
+            }
+          ],
+          "type": "onePerLine"
+        }
+      ]
+    }
+  }
+}
