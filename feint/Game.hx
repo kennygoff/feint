@@ -9,6 +9,7 @@ class Game {
   public var window(default, null):Window;
 
   // TODO: Frame info
+  // TODO: Deterministic semi-fixed frame rate https://gafferongames.com/post/fix_your_timestep/
   public var fps(default, null):Int;
   public var frameTime(default, null):Float;
 
