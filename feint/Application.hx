@@ -1,5 +1,6 @@
 package feint;
 
+import feint.debug.FeintException;
 import feint.debug.Logger;
 import feint.renderer.Renderer;
 
@@ -11,11 +12,21 @@ typedef ApplicationOptions = {
 }
 
 class Application {
+  public static var application:Application;
+
+  var lastTime:Float;
   var name:String;
   var window:Window;
   var game:Game;
 
   function new(options:ApplicationOptions) {
+    if (application != null) {
+      throw new FeintException(
+        'ApplicationAlreadyCreated',
+        'Only one Application can run at the same time.'
+      );
+    }
+
     setup(options);
     init();
     start();
@@ -43,6 +54,8 @@ class Application {
 
     var renderer = new Renderer(window.renderContext);
     game = new Game(renderer);
+    @:privateAccess(Game)
+    game.window = window;
   }
 
   function start() {
@@ -61,7 +74,9 @@ class Application {
     #end
   }
 
-  function onFrame(elapsed:Float) {
+  function onFrame(timeSince:Float) {
+    var elapsed = timeSince - lastTime;
+    lastTime = timeSince;
     update(elapsed);
     @:privateAccess(Game)
     render(game.renderer);

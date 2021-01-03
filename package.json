@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "lix download",
-    "samples:hello-feint": "cd samples/hello-feint && haxe compile.hxml && open build/web/index.html"
+    "samples:hello-feint": "cd samples/hello-feint && haxe compile.hxml && open build/web/index.html",
+    "samples:brick-breaker": "cd samples/brick-breaker && haxe compile.hxml && open build/web/index.html"
   },
   "dependencies": {},
   "devDependencies": {

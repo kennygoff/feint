@@ -1,0 +1,11 @@
+{
+  "name": "feint",
+  "url": "https://github.com/kennygoff/feint/",
+  "license": "MIT",
+  "tags": [],
+  "description": "A game engine for crafting 2D games in Haxe",
+  "version": "0.0.0",
+  "releasenote": "DEV",
+  "contributors": ["Kenny"],
+  "dependencies": {}
+}
