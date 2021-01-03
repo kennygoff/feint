@@ -1,14 +1,11 @@
 package feint.forge;
 
-import feint.forge.System.RenderSystem;
-import feint.renderer.Renderer;
-
 using Lambda;
 
-import feint.debug.Logger;
-import feint.debug.FeintException;
+import feint.forge.System.RenderSystem;
 import feint.forge.Entity;
 import feint.forge.Component;
+import feint.renderer.Renderer;
 
 class Forge {
   var entities:Array<EntityId> = [];
@@ -95,30 +92,3 @@ class Forge {
     renderSystems = [];
   }
 }
-// class Forge {
-//   public var entities:Map<String, EntityId> = new Map<String, EntityId>();
-//   public var components:Map<Class<Component>, Array<Component>>;
-//   public var systems:Array<System> = [];
-//   public function addSystem(system:System) {
-//     systems.push(system);
-//   }
-//   public function addEntity(key:String, id:EntityId):EntityId {
-//     if (entities.exists(key)) {
-//       Logger.error('Cannot register multiple entities with the same key!');
-//       throw new FeintException(
-//         'ForgeEntityKeyExists',
-//         'A Forge Entity with the key ${key} already exists.'
-//       );
-//     }
-//     entities[key] = id;
-//     return id;
-//   }
-//   public function getEntities(componentTypes:Array<Class<Component>>):Array<EntityId> {
-//     return [];
-//   }
-//   public function update(elapsed:Float) {
-//     for (system in systems) {
-//       system.update(elapsed, this);
-//     }
-//   }
-// }
