@@ -6,6 +6,12 @@ typedef RendererPrimitiveOptions = {
   var ?strokeWidth:Float;
 }
 
+enum abstract TextAlign(String) to String {
+  var Left = 'left';
+  var Center = 'center';
+  var Right = 'right';
+}
+
 class Renderer {
   var renderContext:RenderContext;
 
@@ -27,7 +33,14 @@ class Renderer {
     renderContext.drawRect(x, y, width, height, options);
   }
 
-  public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String) {
-    renderContext.drawText(x, y, text, fontSize, font);
+  public function drawText(
+    x:Int,
+    y:Int,
+    text:String,
+    fontSize:Int,
+    font:String,
+    align:TextAlign = Left
+  ) {
+    renderContext.drawText(x, y, text, fontSize, font, align);
   }
 }

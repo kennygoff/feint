@@ -1,5 +1,6 @@
 package scenes;
 
+import js.html.Position;
 import feint.input.device.Keyboard.KeyCode;
 import feint.input.InputManager;
 
@@ -10,6 +11,7 @@ import feint.renderer.Renderer;
 
 class PlayScene extends Scene {
   final backgroundColor:Int = 0xFF000000;
+  var ballsRemaining:Int;
   var world:World;
   var paddle:BlockEntity;
   var ball:BlockEntity;
@@ -31,6 +33,7 @@ class PlayScene extends Scene {
     paddle.velocity = new VelocityComponent(0, 0);
 
     // Setup ball
+    ballsRemaining = 3;
     ball = new BlockEntity();
     ball.size = new SizeComponent(12, 12);
     ball.position = new PositionComponent(
@@ -47,7 +50,7 @@ class PlayScene extends Scene {
       var x = i % brickRows;
       var y = Math.floor(i / brickRows);
       brick.size = new SizeComponent(Math.floor((game.window.width - 32 - 40) / 20), 12);
-      brick.position = new PositionComponent(16 + (brick.size.width + 2) * x, 16 + (16 * y));
+      brick.position = new PositionComponent(16 + (brick.size.width + 2) * x, 32 + (16 * y));
       brick.velocity = new VelocityComponent(0, 0);
       return false; // mapi requires returning something
     });
@@ -59,11 +62,24 @@ class PlayScene extends Scene {
   override public function update(elapsed:Float) {
     super.update(elapsed);
 
+    BallReviveSystem.update(elapsed, world, [ball]);
     PaddleControlSystem.update(elapsed, world, [paddle]);
-    SimpleMomentumSystem.update(elapsed, world, [paddle]);
+    PaddleMomentumSystem.update(elapsed, world, [paddle]);
     PaddleBounceSystem.update(elapsed, world, paddle, ball);
-    SimplePhysicsSystem.update(elapsed, world, [ball]);
+    // TODO: ballsRemaining should be data in a component
+    if (BallKillSystem.update(elapsed, world, [ball])) {
+      ballsRemaining--;
+      if (ballsRemaining < 0) {
+        game.changeScene(new MainMenuScene());
+        return;
+      }
+    }
+    BallPhysicsSystem.update(elapsed, world, [ball]);
     BrickBreakSystem.update(elapsed, world, bricks, ball);
+    if (VictorySystem.update(elapsed, world, bricks)) {
+      game.changeScene(new MainMenuScene());
+      return;
+    }
   }
 
   override public function render(renderer:Renderer) {
@@ -73,6 +89,16 @@ class PlayScene extends Scene {
     super.render(renderer);
 
     RenderSystem.render(renderer, world, [ball, paddle].concat(bricks));
+
+    // Render Balls Remaining
+    renderer.drawText(
+      game.window.width - 4,
+      4,
+      'Balls Remaining: ${ballsRemaining}',
+      16,
+      'sans-serif',
+      Right
+    );
 
     // Render FPS
     renderer.drawText(4, 4, 'FPS: ${game.fps}', 16, 'sans-serif');
@@ -89,7 +115,7 @@ class World {
   }
 }
 
-class SimpleMomentumSystem {
+class PaddleMomentumSystem {
   public static function update(elapsed:Float, world:World, entities:Array<Dynamic>) {
     for (entity in entities) {
       var velocity:VelocityComponent = entity.velocity;
@@ -111,7 +137,39 @@ class SimpleMomentumSystem {
   }
 }
 
-class SimplePhysicsSystem {
+class BallReviveSystem {
+  public static function update(elapsed:Float, world:World, entities:Array<Dynamic>) {
+    for (entity in entities) {
+      var velocity:VelocityComponent = entity.velocity;
+
+      if (velocity.x == 0 && velocity.y == 0) {
+        velocity.x = 1;
+        velocity.y = 1;
+      }
+    }
+  }
+}
+
+class BallKillSystem {
+  public static function update(elapsed:Float, world:World, entities:Array<Dynamic>):Bool {
+    for (entity in entities) {
+      var position:PositionComponent = entity.position;
+      var size:SizeComponent = entity.size;
+      var velocity:VelocityComponent = entity.velocity;
+
+      if (position.y + size.height >= world.position.y + world.size.height - 20) {
+        position.x = world.size.width / 2 - size.width / 2;
+        position.y = world.size.height / 2 - size.height / 2;
+        velocity.x = 0;
+        velocity.y = 0;
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+class BallPhysicsSystem {
   public static function update(elapsed:Float, world:World, entities:Array<Dynamic>) {
     for (entity in entities) {
       var velocity:VelocityComponent = entity.velocity;
@@ -129,11 +187,9 @@ class SimplePhysicsSystem {
         velocity.x = -Math.abs(velocity.x);
       }
 
-      // Bounce off ceiling and floor
+      // Bounce off ceiling
       if (position.y < world.position.y) {
         velocity.y = Math.abs(velocity.y);
-      } else if (position.y + size.height >= world.position.y + world.size.height) {
-        velocity.y = -Math.abs(velocity.y);
       }
     }
   }
@@ -155,7 +211,7 @@ class SimplePhysicsSystem {
 
 class PaddleBounceSystem {
   public static function update(elapsed:Float, world:World, paddle:Dynamic, ball:Dynamic) {
-    if (SimplePhysicsSystem.overlaps(paddle, ball)) {
+    if (BallPhysicsSystem.overlaps(paddle, ball)) {
       var paddlePosition:PositionComponent = paddle.position;
       var paddleSize:SizeComponent = paddle.size;
       var ballPosition:PositionComponent = ball.position;
@@ -231,12 +287,32 @@ class BrickBreakSystem {
       var position:PositionComponent = entity.position;
       var size:SizeComponent = entity.size;
 
-      if (SimplePhysicsSystem.overlaps(ball, entity)) {
+      if (BallPhysicsSystem.overlaps(ball, entity)) {
+        // TODO: Implement something like http://noonat.github.io/intersect/
+        var deltaX = ballPosition.x
+          + ballSize.width / 2 < position.x + size.width / 2 ? position.x +
+            size.width - ballPosition.x : ballPosition.x + ballSize.width - position.x;
+        var deltaY = ballPosition.y
+          + ballSize.height / 2 < position.y + size.height / 2 ? position.y +
+            size.height - ballPosition.y : ballPosition.y + ballSize.height - position.y;
+        if ((deltaX / (ballSize.width + size.width)) > (deltaY / (ballSize.height + size.height))) {
+          ballVelocity.x = -ballVelocity.x;
+        } else {
+          ballVelocity.y = -ballVelocity.y;
+        }
         position.x = -1000;
-        ballVelocity.x = -ballVelocity.x;
-        ballVelocity.y = -ballVelocity.y;
+        return;
       }
     }
+  }
+}
+
+class VictorySystem {
+  public static function update(elapsed:Float, world:World, entities:Array<Dynamic>):Bool {
+    return entities.foreach((entity) -> {
+      var position:PositionComponent = entity.position;
+      return position.x < 0;
+    });
   }
 }
 

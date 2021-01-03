@@ -1,5 +1,6 @@
 package feint.renderer;
 
+import feint.renderer.Renderer.TextAlign;
 import feint.renderer.Renderer.RendererPrimitiveOptions;
 import js.html.CanvasRenderingContext2D;
 import js.html.CanvasElement;
@@ -63,8 +64,9 @@ class RenderContext {
     #end
   }
 
-  public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String) {
+  public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
     #if js
+    webContext.textAlign = align;
     webContext.fillStyle = colorToRGBA(0xFFFFFFFF);
     webContext.font = '${fontSize}px ${font}';
     webContext.textBaseline = 'top';
