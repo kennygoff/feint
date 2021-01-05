@@ -27,9 +27,7 @@ class Sprite {
     animationMap:AnimationMap
   ) {
     final cols = Math.floor(textureWidth / frameWidth);
-    trace(cols);
     final rows = Math.floor(textureHeight / frameHeight);
-    trace(rows);
     final frames:Array<SpriteFrame> = [
       for (row in 0...rows)
         for (col in 0...cols)
@@ -40,7 +38,6 @@ class Sprite {
             height: frameHeight
           }
     ];
-    trace(frames);
     animation = new SpriteAnimation(frames, animationMap);
   }
 
