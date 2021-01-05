@@ -6,6 +6,13 @@ typedef RendererPrimitiveOptions = {
   var ?strokeWidth:Float;
 }
 
+typedef TextureClip = {
+  var x:Int;
+  var y:Int;
+  var width:Int;
+  var height:Int;
+}
+
 enum abstract TextAlign(String) to String {
   var Left = 'left';
   var Center = 'center';
@@ -42,5 +49,9 @@ class Renderer {
     align:TextAlign = Left
   ) {
     renderContext.drawText(x, y, text, fontSize, font, align);
+  }
+
+  public function drawImage(x:Int, y:Int, assetId:String, ?clip:TextureClip, ?scale:Float) {
+    renderContext.drawImage(x, y, assetId, clip, scale);
   }
 }

@@ -2,6 +2,7 @@ package feint.renderer;
 
 import feint.renderer.Renderer.TextAlign;
 import feint.renderer.Renderer.RendererPrimitiveOptions;
+import feint.renderer.Renderer.TextureClip;
 import js.html.CanvasRenderingContext2D;
 import js.html.CanvasElement;
 import feint.debug.FeintException;
@@ -71,6 +72,42 @@ class RenderContext {
     webContext.font = '${fontSize}px ${font}';
     webContext.textBaseline = 'top';
     webContext.fillText(text, x, y);
+    #else
+    throw new FeintException('NotImplemented', 'Not implemented.');
+    #end
+  }
+
+  public function drawImage(x:Int, y:Int, assetId:String, ?clip:TextureClip, ?scale:Float) {
+    #if js
+    if (clip != null) {
+      if (scale != null) {
+        webContext.drawImage(
+          cast js.Browser.document.getElementById(assetId),
+          clip.x,
+          clip.y,
+          clip.width,
+          clip.height,
+          x,
+          y,
+          clip.width * scale,
+          clip.height * scale
+        );
+      } else {
+        webContext.drawImage(
+          cast js.Browser.document.getElementById(assetId),
+          clip.x,
+          clip.y,
+          clip.width,
+          clip.height,
+          x,
+          y,
+          clip.width,
+          clip.height
+        );
+      }
+    } else {
+      webContext.drawImage(cast js.Browser.document.getElementById(assetId), x, y);
+    }
     #else
     throw new FeintException('NotImplemented', 'Not implemented.');
     #end
