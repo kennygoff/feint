@@ -1,5 +1,4 @@
-# --library feint:../..
---class-path ../..
+--class-path ../../src
 --class-path src
 --debug
 --js build/web/bin/main.js
