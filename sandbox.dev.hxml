@@ -1,0 +1,6 @@
+--class-path src
+--class-path sandbox/src
+-D feint:projectRoot=sandbox
+--js sandbox/build/web/bin/sandbox.js
+--main Main
+--debug

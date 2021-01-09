@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    ::foreach preloadedAssets::
+      <img id="::id::" src="::relativePath::" style="display: none;" />
+    ::end::
+    <script src="bin/main.js"></script>
+  </body>
+</html>

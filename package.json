@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "lix download",
+    "sandbox": "haxe sandbox.hxml && node sandbox/build/web/bin/sandbox.js",
     "samples:hello-feint": "cd samples/hello-feint && haxe compile.hxml && open build/web/index.html",
     "samples:brick-breaker": "cd samples/brick-breaker && haxe compile.hxml && open build/web/index.html",
     "samples:forge-ecs": "cd samples/forge-ecs && haxe compile.hxml && open build/web/index.html",

@@ -1,0 +1,8 @@
+--class-path src
+--class-path sandbox/src
+-D feint:clean
+-D feint:projectRoot=sandbox
+--macro feint.assets.macros.AssetBuilder.buildWeb()
+--js sandbox/build/web/bin/sandbox.js
+--main Main
+--debug

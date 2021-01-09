@@ -1,5 +1,5 @@
 # Dependency installs
-node_modules/
+node_modules
 
 # Platform files
 .DS_Store
