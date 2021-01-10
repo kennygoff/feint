@@ -1,4 +1,0 @@
---class-path ../../src
---debug
---js build/web/bin/main.js
---main HelloFeint
