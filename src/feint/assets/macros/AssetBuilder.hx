@@ -1,6 +1,8 @@
 package feint.assets.macros;
 
 #if macro
+using Lambda;
+
 import Sys;
 import haxe.io.Path;
 import haxe.macro.Context;
@@ -83,15 +85,45 @@ class AssetBuilder {
     }
   }
 
-  public static final htmlTemplate = '<!DOCTYPE html>
-<html>
-  <body>
-    ::foreach preloadedAssets::<img id="::id::" src="::relativePath::" style="display: none;" />
-    ::end::
-    <script src="bin/main.js"></script>
-  </body>
-</html>
-';
+  public static final htmlTemplate = '
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <style type="text/css">
+        ::foreach webFonts::
+          @font-face {
+            font-family: "::name::";
+            src: ::src::;
+            font-weight: normal;
+            font-style: normal;
+          }
+        ::end::
+        body {
+          ::foreach webFonts::
+            font-family: "::name::";
+          ::end::
+          padding: 0;
+          margin: 0;
+        }
+        canvas {
+          font-smooth: never;
+          -webkit-font-smoothing: none;
+        }
+      </style>
+    </head>
+    <body>
+      ::foreach preloadedAssets::
+        ::if (type == "image")::
+          <img id="::id::" src="::relativePath::" style="display: none;" />
+        ::elseif (type == "font")::
+        ::end::
+      ::end::
+      <script src="bin/main.js"></script>
+    </body>
+  </html>  
+  ';
+
+  public static final assetTypes = ["png" => "image", "woff" => "font", "woff2" => "font", "ttf" => "font"];
 
   public static function generateHtml(assetPaths:Array<String>) {
     final projectRoot = Context.definedValue("feint:projectRoot");
@@ -101,17 +133,41 @@ class AssetBuilder {
     final buildWebFolder = Path.join([cwd, projectRoot, "build/web"]);
     final template = new Template(htmlTemplate);
 
+    final webFontFiles = assetPaths.filter(
+      path -> path.split('.').pop() == 'woff' || path.split('.').pop() == 'woff2');
+    final webFonts:Map<String, Dynamic> = webFontFiles.fold(
+      (path, fonts : Map<String, Dynamic>) -> {
+        final fontName:String = path.split('/').pop().split("-").join("_").split(".").shift();
+        if (fonts[fontName] == null) {
+          fonts[fontName] = {
+            files: [],
+          };
+        }
+        fonts[fontName].files.push({
+          relativePath: path.split(buildWebFolder + "/").pop(),
+          filetype: path.split('.').pop()
+        });
+        return fonts;
+      },
+      new Map<String, Dynamic>()
+    );
     final assets = {
       preloadedAssets: [
         for (path in assetPaths)
-          ({
-            id:path.split('/')
-              .pop()
-              .split("-")
-              .join("_")
-              .split(".")
-              .join("__"), relativePath:path.split(buildWebFolder + "/").pop()
-          })
+          {
+            id: path.split('/').pop().split("-").join("_").split(".").join("__"),
+            type: assetTypes.get(path.split('.').pop()),
+            relativePath: path.split(buildWebFolder + "/").pop()
+          }
+      ],
+      webFonts: [
+        for (fontName => fontObj in webFonts)
+          {
+            name: fontName,
+            src: fontObj.files.map(
+              file -> 'url("${file.relativePath}") format("${file.filetype}")'
+            )
+              .join(',')}
       ]
     }
 

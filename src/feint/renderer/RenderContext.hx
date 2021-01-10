@@ -136,6 +136,9 @@ class RenderContext {
     webCanvas.style.height = height + 'px';
     webContext.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
 
+    // Disable smoothing
+    webContext.imageSmoothingEnabled = false;
+
     Logger.info('Created RenderContext using ${webAPI} API');
   }
   #else

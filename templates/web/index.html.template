@@ -1,8 +1,34 @@
 <!DOCTYPE html>
 <html>
+  <head>
+  	<style type="text/css">
+      ::foreach webFonts::
+        @font-face {
+          font-family: "::name::";
+          src: ::src::;
+          font-weight: normal;
+          font-style: normal;
+        }
+      ::end::
+			body {
+        ::foreach webFonts::
+				  font-family: "::name::";
+        ::end::
+        padding: 0;
+        margin: 0;
+			}
+      canvas {
+        font-smooth: never;
+        -webkit-font-smoothing: none;
+      }
+		</style>
+  </head>
   <body>
     ::foreach preloadedAssets::
-      <img id="::id::" src="::relativePath::" style="display: none;" />
+      ::if (type == "image")::
+        <img id="::id::" src="::relativePath::" style="display: none;" />
+      ::elseif (type == "font")::
+      ::end::
     ::end::
     <script src="bin/main.js"></script>
   </body>
