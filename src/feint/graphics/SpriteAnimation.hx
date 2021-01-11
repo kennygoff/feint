@@ -17,11 +17,13 @@ class SpriteAnimation {
   var animationMap:AnimationMap;
   var currentTick:Int;
   var frameTick:Int;
+  var looping:Bool;
 
   public function new(frames:Array<SpriteFrame>, animationMap:AnimationMap) {
     this.frames = frames;
     this.animationMap = animationMap;
     this.currentAnimation = null;
+    this.looping = false;
   }
 
   /**
@@ -30,11 +32,12 @@ class SpriteAnimation {
    * @param animationName Name of animation to play
    * @param frameTick Framerate measured in ticks (e.g. frameTick of 15 would be an animation speed of 15/60 aka 4 frames a second)
    */
-  public function play(animationName:String, frameTick:Int) {
+  public function play(animationName:String, frameTick:Int, ?looping:Bool = false) {
     currentAnimation = animationName;
     currentFrame = 0;
     currentTick = 0;
     this.frameTick = frameTick;
+    this.looping = looping;
   }
 
   public function update() {
@@ -42,10 +45,13 @@ class SpriteAnimation {
 
     if (currentTick == frameTick) {
       currentTick = 0;
-      currentFrame++;
 
-      if (currentFrame == animationMap[currentAnimation].length) {
+      var ended = currentFrame == animationMap[currentAnimation].length - 1;
+
+      if (ended && looping) {
         currentFrame = 0;
+      } else if (!ended) {
+        currentFrame++;
       }
     }
   }

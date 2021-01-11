@@ -41,16 +41,16 @@ class Sprite {
     animation = new SpriteAnimation(frames, animationMap);
   }
 
-  public function drawAt(x:Int, y:Int, renderer:Renderer) {
+  public function drawAt(x:Int, y:Int, renderer:Renderer, ?scale:Float) {
     if (animation != null) {
-      renderer.drawImage(x, y, assetId, animation.getFrame());
+      renderer.drawImage(x, y, assetId, animation.getFrame(), scale);
     } else {
       renderer.drawImage(x, y, assetId, {
         x: 0,
         y: 0,
-        width: 96,
-        height: 96
-      });
+        width: textureWidth,
+        height: textureHeight
+      }, scale);
     }
   }
 }
