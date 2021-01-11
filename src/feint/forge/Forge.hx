@@ -111,6 +111,22 @@ class Forge {
     );
   }
 
+  public function removeEntity(entityId:EntityId) {
+    entities.remove(entityId);
+    for (_ => entityList in labelMap) {
+      entityList.remove(entityId);
+    }
+    entityLabels.remove(entityId);
+    for (_ => componentList in components) {
+      for (component in componentList) {
+        if (map[entityId].contains(component)) {
+          componentList.remove(component);
+        }
+      }
+    }
+    map.remove(entityId);
+  }
+
   public function addSystem(system:System) {
     systems.push(system);
   }
