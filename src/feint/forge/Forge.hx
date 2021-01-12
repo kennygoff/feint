@@ -73,6 +73,11 @@ class Forge {
     componentClassNames:Array<ComponentType>,
     ?labels:Array<String>
   ):Array<EntityId> {
+    if (componentClassNames.exists(componentClassName -> components[componentClassName] == null)) {
+      // Expecting a component that hasn't been registered
+      return [];
+    }
+
     if (componentClassNames.length == 1) {
       var matchingEntities = components[componentClassNames[0]].map(component -> component.entity);
       if (labels != null) {
@@ -83,10 +88,9 @@ class Forge {
       return matchingEntities;
     }
 
-    var compArr:Array<Array<Component>> = componentClassNames.filter(
-      componentClassName -> components[componentClassName] != null
-    )
-      .map(componentClassName -> components[componentClassName]);
+    var compArr:Array<Array<Component>> = componentClassNames.map(
+      componentClassName -> components[componentClassName]
+    );
 
     var matchingEntities = compArr.fold((components, jointEntities) -> {
       var componentEntities = components.map(component -> component.entity);
@@ -109,6 +113,14 @@ class Forge {
     return cast map[entityId].find(
       component -> component.getComponentType() == (cast componentType : Class<Component>)
     );
+  }
+
+  public function getEntityLabels(entityId:EntityId, ?filterLabels:Array<String>):Array<String> {
+    if (filterLabels != null) {
+      return entityLabels[entityId].filter(label -> filterLabels.contains(label));
+    }
+
+    return entityLabels[entityId];
   }
 
   public function removeEntity(entityId:EntityId) {
