@@ -124,6 +124,11 @@ class Forge {
   }
 
   public function removeEntity(entityId:EntityId) {
+    if (!entities.contains(entityId)) {
+      // Entity not found
+      return;
+    }
+
     entities.remove(entityId);
     for (_ => entityList in labelMap) {
       entityList.remove(entityId);
