@@ -8,11 +8,13 @@ class Sprite {
   public var animation(default, null):SpriteAnimation;
   public var textureWidth:Int;
   public var textureHeight:Int;
+  public var alpha:Float;
 
   var assetId:String;
 
   public function new(assetId:String) {
     this.assetId = assetId;
+    this.alpha = 1.0;
   }
 
   /**
