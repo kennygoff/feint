@@ -12,6 +12,7 @@ typedef SpriteFrame = {
 class SpriteAnimation {
   public var currentAnimation(default, null):String;
   public var currentFrame(default, null):Int;
+  public var finished(default, null):Bool;
 
   var frames:Array<SpriteFrame>;
   var animationMap:AnimationMap;
@@ -24,6 +25,7 @@ class SpriteAnimation {
     this.animationMap = animationMap;
     this.currentAnimation = null;
     this.looping = false;
+    this.finished = false;
   }
 
   /**
@@ -38,6 +40,7 @@ class SpriteAnimation {
     currentTick = 0;
     this.frameTick = frameTick;
     this.looping = looping;
+    this.finished = false;
   }
 
   public function update() {
@@ -52,6 +55,8 @@ class SpriteAnimation {
         currentFrame = 0;
       } else if (!ended) {
         currentFrame++;
+      } else if (ended) {
+        finished = true;
       }
     }
   }
