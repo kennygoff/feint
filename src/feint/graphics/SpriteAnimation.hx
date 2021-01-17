@@ -20,12 +20,18 @@ class SpriteAnimation {
   var frameTick:Int;
   var looping:Bool;
 
+  // TODO: Refactor
+  final tickTime:Float = 1 / 60 * 1000;
+  final tickRoundingError:Float = 1;
+  var currentTickTime:Float;
+
   public function new(frames:Array<SpriteFrame>, animationMap:AnimationMap) {
     this.frames = frames;
     this.animationMap = animationMap;
     this.currentAnimation = null;
     this.looping = false;
     this.finished = false;
+    this.currentTickTime = 0;
   }
 
   /**
@@ -38,13 +44,18 @@ class SpriteAnimation {
     currentAnimation = animationName;
     currentFrame = 0;
     currentTick = 0;
+    currentTickTime = 0;
     this.frameTick = frameTick;
     this.looping = looping;
     this.finished = false;
   }
 
-  public function update() {
-    currentTick++;
+  public function update(?elapsed:Float = 1 / 60 * 1000) {
+    currentTickTime += elapsed;
+    if (currentTickTime >= tickTime - tickRoundingError) {
+      currentTick++;
+      currentTickTime = 0;
+    }
 
     if (currentTick == frameTick) {
       currentTick = 0;
