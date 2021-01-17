@@ -28,12 +28,19 @@ class AssetFiles {
       name = name.split("-").join("_").split(".").join("__");
       relativePath = "assets/" + relativePath;
 
+      #if js
+      // Use the id for the html tag
+      final value = name;
+      #else
+      final value = relativePath;
+      #end
+
       fields.push({
         name: name,
         doc: 'Relative path for file ${file}',
         access: [Access.APublic, Access.AStatic, Access.AInline, Access.AFinal],
         pos: Context.currentPos(),
-        kind: FieldType.FVar(macro:String, macro $v{relativePath})
+        kind: FieldType.FVar(macro:String, macro $v{name})
       });
     }
 

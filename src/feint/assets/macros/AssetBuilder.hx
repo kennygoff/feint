@@ -116,6 +116,8 @@ class AssetBuilder {
         ::if (type == "image")::
           <img id="::id::" src="::relativePath::" style="display: none;" />
         ::elseif (type == "font")::
+        ::elseif (type == "audio")::
+          <audio id="::id::" src="::relativePath::" preload="auto" style="display: none;" />
         ::end::
       ::end::
       <script src="bin/main.js"></script>
@@ -123,7 +125,13 @@ class AssetBuilder {
   </html>  
   ';
 
-  public static final assetTypes = ["png" => "image", "woff" => "font", "woff2" => "font", "ttf" => "font"];
+  public static final assetTypes = [
+    "png" => "image",
+    "woff" => "font",
+    "woff2" => "font",
+    "ttf" => "font",
+    "ogg" => "audio"
+  ];
 
   public static function generateHtml(assetPaths:Array<String>) {
     final projectRoot = Context.definedValue("feint:projectRoot");
