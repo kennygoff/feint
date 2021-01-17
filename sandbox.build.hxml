@@ -3,6 +3,6 @@
 -D feint:clean
 -D feint:projectRoot=sandbox
 --macro feint.assets.macros.AssetBuilder.buildWeb()
---js sandbox/build/web/bin/sandbox.js
+--js sandbox/build/web/bin/main.js
 --main Main
 --debug
