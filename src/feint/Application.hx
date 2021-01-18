@@ -1,7 +1,7 @@
 package feint;
 
-import feint.debug.FeintException;
 import feint.debug.Logger;
+import feint.debug.FeintException;
 import feint.renderer.Renderer;
 
 /**
@@ -9,18 +9,19 @@ import feint.renderer.Renderer;
  */
 typedef ApplicationSettings = {
   /**
-   * Title of the application
+   * Title of the application for the window title bar and browser window
+   *
+   * **Note:** Currently unused in web builds, use the compiler flag
+   * `-D feint:appTitle=Your App Title`
    */
-  // TODO: Title not used by AssetBuilder, so won't actually show up in the title bar
+  // TODO: Title not used by AssetBuilder, so won't actually show up in the title bar.
   var title:String;
 
   /**
    * Initial window size
    *
-   * > **Platform: Web**
-   * >
-   * > In the web platform, the size of the application refers to the size of
-   * > the canvas that the game is drawn to.
+   * **Note:** In the web platform, the size of the application refers to the
+   * size of the canvas that the game is drawn to.
    */
   var size:{
     var width:Int;
@@ -51,17 +52,47 @@ typedef ApplicationSettings = {
  * ```
  */
 class Application {
-  @:dox(hide)
-  public static var application:Application;
-
-  var lastTime:Float;
-  var name:String;
+  /**
+   * Main window of the application, created on startup.
+   *
+   * **Note:** Currently only one window is supported, but in the future there
+   * may be support added to create additional windows. This will always refer
+   * to the main default window.
+   */
+  @:dox(show)
   var window:Window;
+
+  /**
+   * Main game object that handles all game-specific logic and rendering.
+   */
+  @:dox(show)
   var game:Game;
 
   /**
-   * Creates a Feint Application, initializes a `Window` and `Game`, and start the
-   * first frame
+   * Main renderer of the application attached to the `renderer.RenderContext`
+   * of the default `Window`, created on startup.
+   *
+   * **Note:** Currently only one window is supported, but in the future there
+   * may be support added to create additional windows. This will always refer
+   * to the main default window's renderer.
+   */
+  @:dox(show)
+  var renderer:Renderer;
+
+  /**
+   * Static instance of the application, used to check and enforce we only have
+   * one instance created.
+   */
+  static var application:Application;
+
+  /**
+   * Timestamp of the last frame we processed, used to calulate elapsed time.
+   */
+  var lastTime:Float;
+
+  /**
+   * Creates a Feint Application, initializes a `Window` and `Game`, and starts
+   * the first frame
    * @param settings Settings used by Application to start up application and
    * window
    */
@@ -74,6 +105,7 @@ class Application {
       );
     }
 
+    Logger.info('Application starting...');
     setup(settings);
     init();
     start();
@@ -83,17 +115,17 @@ class Application {
    * Initialization function for doing setup before the game starts. Is run
    * after the `Window` and `Game` are created but before the first frame starts.
    *
-   * Override this function in your game to. Typically used to register the
-   * initial `Scene` for the game.
+   * Override this function in your game to run code that has to be run before
+   * the initial frame. Typically used to register the initial `Scene` for the
+   * game.
    *
    * ```haxe
-   * override function init() {
+   * override public function init() {
    *   game.setInitialScene(new MyGameScene());
    * }
    * ```
    */
-  @:dox(show)
-  function init() {}
+  public function init() {}
 
   /**
    * Initial setup of application `Window`, `renderer.Renderer`, and `Game`.
@@ -103,11 +135,8 @@ class Application {
    */
   function setup(settings:ApplicationSettings) {
     window = new Window(settings.title, settings.size.width, settings.size.height);
-
-    var renderer = new Renderer(window.renderContext);
-    game = new Game(renderer);
-    @:privateAccess(Game)
-    game.window = window;
+    renderer = new Renderer(window.renderContext);
+    game = new Game(renderer, window);
   }
 
   /**
@@ -175,8 +204,7 @@ class Application {
     var elapsed = timestamp - lastTime;
     lastTime = timestamp;
     update(elapsed);
-    @:privateAccess(Game)
-    render(game.renderer);
+    render(renderer);
 
     requestFrame();
   }
