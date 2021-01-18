@@ -30,11 +30,15 @@ class Game {
     frameTime = elapsed;
     fps = Math.round(1000 / frameTime);
 
-    activeScene.update(elapsed);
+    if (activeScene != null) {
+      activeScene.update(elapsed);
+    }
   }
 
   public function render() {
     renderer.clear();
+
+    renderer.drawRect(0, 0, window.width, window.height, {color: 0xFF000000});
 
     if (activeScene != null) {
       activeScene.render(renderer);

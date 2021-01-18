@@ -1,0 +1,9 @@
+-cp src
+-D doc-gen
+--macro include('feint')
+--no-output
+--each
+
+--next
+-xml docs/docs.xml
+-js docs/docs.js

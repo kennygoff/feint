@@ -89,6 +89,7 @@ class AssetBuilder {
   <!DOCTYPE html>
   <html>
     <head>
+      <title>::appTitle::</title>
       <style type="text/css">
         ::foreach webFonts::
           @font-face {
@@ -139,6 +140,10 @@ class AssetBuilder {
     final assetSrcFolder = Path.join([cwd, projectRoot, "src", "assets"]);
     final assetsDstFolder = Path.join([cwd, projectRoot, "build/web", "assets"]);
     final buildWebFolder = Path.join([cwd, projectRoot, "build/web"]);
+    var appTitle = Context.definedValue("feint:appTitle");
+    if (appTitle == null) {
+      appTitle = 'Feint Engine';
+    }
     final template = new Template(htmlTemplate);
 
     final webFontFiles = assetPaths.filter(
@@ -159,7 +164,8 @@ class AssetBuilder {
       },
       new Map<String, Dynamic>()
     );
-    final assets = {
+    final templateVars = {
+      appTitle: appTitle,
       preloadedAssets: [
         for (path in assetPaths)
           {
@@ -179,7 +185,7 @@ class AssetBuilder {
       ]
     }
 
-    final html = template.execute(assets);
+    final html = template.execute(templateVars);
     File.saveContent(Path.join([buildWebFolder, "index.html"]), html);
   }
 }

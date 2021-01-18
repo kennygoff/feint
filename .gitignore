@@ -3,3 +3,6 @@ node_modules
 
 # Platform files
 .DS_Store
+
+# Generated docs
+docs

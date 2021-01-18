@@ -2,7 +2,8 @@
 --class-path sandbox/src
 -D feint:clean
 -D feint:projectRoot=sandbox
+-D feint:appTitle=Feint Sandbox
 --macro feint.assets.macros.AssetBuilder.buildWeb()
 --js sandbox/build/web/bin/main.js
---main Main
+--main Sandbox
 --debug
