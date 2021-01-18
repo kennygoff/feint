@@ -28,7 +28,7 @@ class Logger {
   public static function info(message:String) {
     #if debug
     #if js
-    js.html.Console.warn('[Feint] Info: ${message}');
+    js.html.Console.info('[Feint] ${message}');
     #else
     trace('[Feint] Info: ${message}');
     #end

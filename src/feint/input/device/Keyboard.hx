@@ -1,6 +1,5 @@
 package feint.input.device;
 
-import feint.debug.Logger;
 import feint.macros.EnumTools;
 import js.html.KeyboardEvent;
 import feint.renderer.RenderContext;
@@ -47,6 +46,7 @@ enum abstract KeyCode(Int) from Int {
   var X = KeyboardEvent.DOM_VK_X;
   var Y = KeyboardEvent.DOM_VK_Y;
   var Z = KeyboardEvent.DOM_VK_Z;
+  var Backtick = KeyboardEvent.DOM_VK_BACK_QUOTE;
 }
 
 enum KeyEvent {

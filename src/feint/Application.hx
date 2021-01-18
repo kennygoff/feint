@@ -1,25 +1,103 @@
 package feint;
 
-import feint.debug.FeintException;
 import feint.debug.Logger;
+import feint.debug.FeintException;
 import feint.renderer.Renderer;
 
-typedef ApplicationOptions = {
-  title:String,
-  size:{
-    width:Int, height:Int
-  }
+/**
+ * Settings used to determine Application startup details
+ */
+typedef ApplicationSettings = {
+  /**
+   * Title of the application for the window title bar and browser window
+   *
+   * **Note:** Currently unused in web builds, use the compiler flag
+   * `-D feint:appTitle=Your App Title`
+   */
+  // TODO: Title not used by AssetBuilder, so won't actually show up in the title bar.
+  var title:String;
+
+  /**
+   * Initial window size
+   *
+   * **Note:** In the web platform, the size of the application refers to the
+   * size of the canvas that the game is drawn to.
+   */
+  var size:{
+    var width:Int;
+    var height:Int;
+  };
 }
 
+/**
+ * Point of entry for all Feint games that handles application setup, render
+ * context, and game initialization.
+ *
+ * Only one Application can be instantiated at once. Extend this class as your
+ * game's main entry class, and create a new instance in the `main` function
+ * to setup a new Feint Application.
+ *
+ * ```haxe
+ * class MyGame extends Application {
+ *   static public function main() {
+ *     new MyGame({
+ *       title: "My Awesome Feint Game",
+ *       size: {
+ *         width: 640,
+ *         height: 360
+ *       }
+ *     });
+ *   }
+ * }
+ * ```
+ */
 class Application {
-  public static var application:Application;
-
-  var lastTime:Float;
-  var name:String;
+  /**
+   * Main window of the application, created on startup.
+   *
+   * **Note:** Currently only one window is supported, but in the future there
+   * may be support added to create additional windows. This will always refer
+   * to the main default window.
+   */
+  @:dox(show)
   var window:Window;
+
+  /**
+   * Main game object that handles all game-specific logic and rendering.
+   */
+  @:dox(show)
   var game:Game;
 
-  function new(options:ApplicationOptions) {
+  /**
+   * Main renderer of the application attached to the `renderer.RenderContext`
+   * of the default `Window`, created on startup.
+   *
+   * **Note:** Currently only one window is supported, but in the future there
+   * may be support added to create additional windows. This will always refer
+   * to the main default window's renderer.
+   */
+  @:dox(show)
+  var renderer:Renderer;
+
+  /**
+   * Static instance of the application, used to check and enforce we only have
+   * one instance created.
+   */
+  static var application:Application;
+
+  /**
+   * Timestamp of the last frame we processed, used to calulate elapsed time.
+   */
+  var lastTime:Float;
+
+  /**
+   * Creates a Feint Application, initializes a `Window` and `Game`, and starts
+   * the first frame
+   * @param settings Settings used by Application to start up application and
+   * window
+   */
+  @:dox(show)
+  function new(settings:ApplicationSettings) {
     if (application != null) {
       throw new FeintException(
         'ApplicationAlreadyCreated',
@@ -27,41 +105,76 @@ class Application {
       );
     }
 
-    setup(options);
+    Logger.info('Application starting...');
+    setup(settings);
     init();
     start();
   }
 
+  /**
+   * Initialization function for doing setup before the game starts. Is run
+   * after the `Window` and `Game` are created but before the first frame starts.
+   *
+   * Override this function in your game to run code that has to be run before
+   * the initial frame. Typically used to register the initial `Scene` for the
+   * game.
+   *
+   * ```haxe
+   * override public function init() {
+   *   game.setInitialScene(new MyGameScene());
+   * }
+   * ```
+   */
   public function init() {}
 
-  public function update(elapsed:Float) {
+  /**
+   * Initial setup of application `Window`, `renderer.Renderer`, and `Game`.
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   * @param settings Settings used by Application to startup application and window
+   */
+  function setup(settings:ApplicationSettings) {
+    window = new Window(settings.title, settings.size.width, settings.size.height);
+    renderer = new Renderer(window.renderContext);
+    game = new Game(renderer, window);
+  }
+
+  /**
+   * Main update function that controls the core game loop.
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   * @param elapsed [milliseconds] Amount of time elapsed in this update frame,
+   * currently locked to monitor framerate
+   */
+  function update(elapsed:Float) {
     window.inputManager.update(elapsed);
     game.update(elapsed);
   }
 
-  public function render(renderer:Renderer) {
+  /**
+   * Main render function executed on each frame after update.
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   * @param renderer Default renderer used by Feint for this application's window
+   */
+  function render(renderer:Renderer) {
     game.render();
   }
 
   /**
-   * Initial setup of application window, renderer, and game.
+   * Starting point for the game and game loop, fires off first frame request.
    *
-   * WARNING: Do not override, used internally by Application only.
-   * @param options ApplicationOptions
+   * **WARNING:** Do not override, used internally by Application only.
    */
-  private function setup(options:ApplicationOptions) {
-    window = new Window(options.title, options.size.width, options.size.height);
-
-    var renderer = new Renderer(window.renderContext);
-    game = new Game(renderer);
-    @:privateAccess(Game)
-    game.window = window;
-  }
-
   function start() {
     requestFrame();
   }
 
+  /**
+   * Trigger for starting each frame event
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   */
   function requestFrame() {
     #if js
     js.Browser.window.requestAnimationFrame(onFrame);
@@ -74,12 +187,24 @@ class Application {
     #end
   }
 
-  function onFrame(timeSince:Float) {
-    var elapsed = timeSince - lastTime;
-    lastTime = timeSince;
+  /**
+   * Frame callback function that handles the core game loop
+   *
+   * The flow of each loop goes through the following steps:
+   *
+   * 1. Calculate elapsed time since last frame
+   * 2. Update
+   * 3. Render
+   * 4. Request next frame
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   * @param timestamp [milliseconds] Current time in seconds
+   */
+  function onFrame(timestamp:Float) {
+    var elapsed = timestamp - lastTime;
+    lastTime = timestamp;
     update(elapsed);
-    @:privateAccess(Game)
-    render(game.renderer);
+    render(renderer);
 
     requestFrame();
   }
