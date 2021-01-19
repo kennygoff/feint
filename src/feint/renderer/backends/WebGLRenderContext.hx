@@ -119,6 +119,11 @@ class WebGLRenderContext implements RenderContext2D {
       'NotImplemented',
       "RenderContext2D.drawImage() not implemented for WebGL"
     );
+    // HTML Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-html.html
+    // Canvas Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-canvas2d.html
+    // Copy from Canvas: https://webglfundamentals.org/webgl/lessons/webgl-text-texture.html
+    // BitmapFonts: https://webglfundamentals.org/webgl/lessons/webgl-text-glyphs.html
+    // https://css-tricks.com/techniques-for-rendering-text-with-webgl/
   }
 
   function setup() {
