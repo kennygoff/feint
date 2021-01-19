@@ -99,14 +99,11 @@ class Game {
    *
    * Render flow:
    *
-   * 1. Clear context
-   * 2. Draw black background
-   * 3. Call render for `Game.activeScene`
+   * 1. Clear context & draw black background
+   * 2. Call render for `Game.activeScene`
    */
   public function render() {
     renderer.clear();
-
-    renderer.drawRect(0, 0, window.width, window.height, {color: 0xFF000000});
 
     if (activeScene != null) {
       activeScene.render(renderer);

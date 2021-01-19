@@ -2,7 +2,7 @@ package feint.input.device;
 
 import feint.macros.EnumTools;
 import js.html.KeyboardEvent;
-import feint.renderer.RenderContext;
+import feint.renderer.RenderContext2D;
 
 enum abstract KeyCode(Int) from Int {
   var Enter = KeyboardEvent.DOM_VK_RETURN;
@@ -68,7 +68,7 @@ class Keyboard {
 
   var eventQueue:Array<KeyEvent>;
 
-  public function new(renderContext:RenderContext) {
+  public function new(renderContext:RenderContext2D) {
     // Initialize Keys
     keys = new Map();
     for (keyCode in supportedKeyCodes) {

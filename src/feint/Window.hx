@@ -1,5 +1,7 @@
 package feint;
 
+import feint.renderer.RenderContext2D;
+import feint.renderer.platforms.WebRenderPlatform;
 import feint.input.InputManager;
 import feint.renderer.RenderContext;
 
@@ -43,7 +45,7 @@ class Window {
    * Context to render all visual elements in the window. The context is
    * platform and backend specific.
    */
-  public var renderContext(default, null):RenderContext;
+  public var renderContext(default, null):RenderContext2D;
 
   /**
    * Application-wide input manager that handles all input events and device
@@ -58,12 +60,19 @@ class Window {
    * @param width Width of the window's render context
    * @param height Height of the window's render context
    */
-  public function new(title:String, width:Int, height:Int) {
+  public function new(title:String, width:Int, height:Int, api:RenderAPI = Canvas) {
     this.title = title;
     this.width = width;
     this.height = height;
 
-    renderContext = new RenderContext(width, height);
+    #if js
+    renderContext = WebRenderPlatform.createContext(width, height, api);
+    #else
+    throw new FeintException(
+      'NotImplemented',
+      'Render Context for non-js targets are not implemented'
+    );
+    #end
     // TODO: Come up with a better way to manage render and input than passing around the render context
     inputManager = new InputManager(renderContext);
   }
