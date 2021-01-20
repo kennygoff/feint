@@ -21,7 +21,7 @@ class WebRenderPlatform {
         throw new FeintException('NotImplemented', 'WebGL2RenderContext not implemented...');
       case WebGL:
         Logger.info('Creating WebGL RenderContext...');
-        var webglContext = canvas.getContext('webgl');
+        var webglContext = canvas.getContext('webgl', {alpha: false});
         if (webglContext == null) {
           Logger.info('WebGL not supported, falling back to Canvas.');
           webglContext = null;

@@ -73,7 +73,15 @@ class CanvasRenderContext implements RenderContext2D {
     context.strokeRect(x, y, width, height);
   }
 
-  public function drawImage(x:Int, y:Int, assetId:String, ?clip:TextureClip, ?scale:Float) {
+  public function drawImage(
+    x:Int,
+    y:Int,
+    assetId:String,
+    ?clip:TextureClip,
+    ?scale:Float,
+    ?textureWidth:Int,
+    ?textureHeight:Int
+  ) {
     if (clip != null) {
       if (scale != null) {
         context.drawImage(

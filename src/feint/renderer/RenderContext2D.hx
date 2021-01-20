@@ -19,7 +19,15 @@ interface RenderContext2D {
     height:Int,
     ?options:RendererPrimitiveOptions
   ):Void;
-  public function drawImage(x:Int, y:Int, assetId:String, ?clip:TextureClip, ?scale:Float):Void;
+  public function drawImage(
+    x:Int,
+    y:Int,
+    assetId:String,
+    ?clip:TextureClip,
+    ?scale:Float,
+    ?textureWidth:Int,
+    ?textureHeight:Int
+  ):Void;
   public function drawText(
     x:Int,
     y:Int,

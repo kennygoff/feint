@@ -51,7 +51,15 @@ class Renderer {
     renderContext.drawText(x, y, text, fontSize, font, align);
   }
 
-  public function drawImage(x:Int, y:Int, assetId:String, ?clip:TextureClip, ?scale:Float) {
-    renderContext.drawImage(x, y, assetId, clip, scale);
+  public function drawImage(
+    x:Int,
+    y:Int,
+    assetId:String,
+    ?clip:TextureClip,
+    ?scale:Float,
+    ?textureWidth:Int,
+    ?textureHeight:Int
+  ) {
+    renderContext.drawImage(x, y, assetId, clip, scale, textureWidth, textureHeight);
   }
 }
