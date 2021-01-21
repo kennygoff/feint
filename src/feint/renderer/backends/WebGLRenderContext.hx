@@ -1,5 +1,6 @@
 package feint.renderer.backends;
 
+import js.html.CanvasRenderingContext2D;
 import js.html.ImageElement;
 import js.html.Image;
 import js.lib.Uint8Array;
@@ -42,6 +43,8 @@ class WebGLRenderContext implements RenderContext2D {
   var defaultResolutionUniformLocation:UniformLocation;
   var defaultColorUniformLocation:UniformLocation;
   var textureBound:Map<String, Bool> = [];
+  var textCanvas:CanvasElement;
+  var textRenderContext:CanvasRenderContext;
 
   public function new(canvas:CanvasElement, context:RenderingContext, width:Int, height:Int) {
     this.width = width;
@@ -50,12 +53,6 @@ class WebGLRenderContext implements RenderContext2D {
     this.canvas = canvas;
     this.context = context;
     setup();
-
-    if (js.Browser.document.getElementById('feint-webgl-text') == null) {
-      var webglText = js.Browser.document.createDivElement();
-      webglText.id = 'feint-webgl-text';
-      js.Browser.document.body.appendChild(webglText);
-    }
   }
 
   public function clear(color:Int = 0xFF000000) {
@@ -68,8 +65,15 @@ class WebGLRenderContext implements RenderContext2D {
     // context.blendFunc(RenderingContext.ONE, RenderingContext.ONE_MINUS_SRC_ALPHA);
     // context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
 
+    // TODO: Text solitions
     if (js.Browser.document.getElementById('feint-webgl-text') != null) {
       js.Browser.document.getElementById('feint-webgl-text').innerHTML = '';
+    }
+    if (textRenderContext != null) {
+      // Not using clear() because we default to clearing with a black background
+      // textRenderContext.clear();
+      @:privateAccess(textRenderContext)
+      textRenderContext.context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     submit();
@@ -260,22 +264,23 @@ class WebGLRenderContext implements RenderContext2D {
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
-    // throw new FeintException(
-    //   'NotImplemented',
-    //   "RenderContext2D.drawImage() not implemented for WebGL"
-    // );
     // HTML Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-html.html
     // Canvas Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-canvas2d.html
     // Copy from Canvas: https://webglfundamentals.org/webgl/lessons/webgl-text-texture.html
     // BitmapFonts: https://webglfundamentals.org/webgl/lessons/webgl-text-glyphs.html
     // https://css-tricks.com/techniques-for-rendering-text-with-webgl/
 
-    if (js.Browser.document.getElementById('feint-webgl-text') != null) {
-      var tempTextDisplay = js.Browser.document.getElementById('feint-webgl-text');
-      var textDiv = js.Browser.document.createDivElement();
-      textDiv.textContent = text;
-      tempTextDisplay.appendChild(textDiv);
+    if (textRenderContext != null) {
+      textRenderContext.drawText(x, y, text, fontSize, font, align);
     }
+
+    // HTML implementation
+    // if (js.Browser.document.getElementById('feint-webgl-text-div') != null) {
+    //   var tempTextDisplay = js.Browser.document.getElementById('feint-webgl-text-div');
+    //   var textDiv = js.Browser.document.createDivElement();
+    //   textDiv.textContent = text;
+    //   tempTextDisplay.appendChild(textDiv);
+    // }
   }
 
   function setup() {
@@ -394,6 +399,34 @@ class WebGLRenderContext implements RenderContext2D {
     // Allows alpha blending for transparency in textures
     context.enable(RenderingContext.BLEND);
     context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
+
+    setupTextRenderContext();
+  }
+
+  /**
+   * Used for rendering text onto a transparent canvas with `drawText`
+   */
+  function setupTextRenderContext() {
+    // Canvas implementation
+    textCanvas = js.Browser.document.createCanvasElement();
+    textCanvas.id = 'feint-webgl-text';
+    textCanvas.width = Std.int(width);
+    textCanvas.height = Std.int(height);
+    textCanvas.style.position = 'absolute';
+    textCanvas.style.top = '0';
+    textCanvas.style.left = '0';
+    textCanvas.style.zIndex = '1';
+    textCanvas.style.background = 'transparent';
+    js.Browser.document.body.appendChild(textCanvas);
+    final textCanvasContext = textCanvas.getContext('2d');
+    textRenderContext = new CanvasRenderContext(textCanvas, textCanvasContext, width, height);
+
+    // HTML implementation
+    // if (js.Browser.document.getElementById('feint-webgl-text-div') == null) {
+    //   var webglText = js.Browser.document.createDivElement();
+    //   webglText.id = 'feint-webgl-text-div';
+    //   js.Browser.document.body.appendChild(webglText);
+    // }
   }
 
   /**
