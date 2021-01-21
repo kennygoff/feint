@@ -20,9 +20,9 @@ enum abstract TextAlign(String) to String {
 }
 
 class Renderer {
-  var renderContext:RenderContext2D;
+  var renderContext:RenderContext;
 
-  public function new(renderContext:RenderContext2D) {
+  public function new(renderContext:RenderContext) {
     this.renderContext = renderContext;
   }
 

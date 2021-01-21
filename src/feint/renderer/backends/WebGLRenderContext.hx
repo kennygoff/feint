@@ -24,7 +24,7 @@ enum abstract WebGLShaderType(Int) to Int {
   var Fragment = RenderingContext.FRAGMENT_SHADER;
 }
 
-class WebGLRenderContext implements RenderContext2D {
+class WebGLRenderContext implements RenderContext {
   public var api(default, null):RenderAPI;
   public var width(default, null):Int;
   public var height(default, null):Int;
@@ -80,10 +80,7 @@ class WebGLRenderContext implements RenderContext2D {
   }
 
   public function resize(width:Int, height:Int) {
-    throw new FeintException(
-      'NotImplemented',
-      "RenderContext2D.resize() not implemented for WebGL"
-    );
+    throw new FeintException('NotImplemented', "RenderContext.resize() not implemented for WebGL");
     // TODO: https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
   }
 

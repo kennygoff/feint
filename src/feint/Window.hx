@@ -1,6 +1,6 @@
 package feint;
 
-import feint.renderer.RenderContext2D;
+import feint.renderer.RenderContext;
 import feint.renderer.platforms.WebRenderPlatform;
 import feint.input.InputManager;
 import feint.renderer.RenderContext;
@@ -45,7 +45,7 @@ class Window {
    * Context to render all visual elements in the window. The context is
    * platform and backend specific.
    */
-  public var renderContext(default, null):RenderContext2D;
+  public var renderContext(default, null):RenderContext;
 
   /**
    * Application-wide input manager that handles all input events and device

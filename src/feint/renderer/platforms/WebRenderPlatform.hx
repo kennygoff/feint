@@ -12,7 +12,7 @@ class WebRenderPlatform {
     width:Int,
     height:Int,
     api:RenderAPI = Canvas
-  ):RenderContext2D {
+  ):RenderContext {
     // Create canvas, which will be used regarless of Render API
     var canvas = createCanvasElement(width, height);
 

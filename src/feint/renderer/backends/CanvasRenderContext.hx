@@ -8,7 +8,7 @@ import feint.renderer.Renderer.TextAlign;
 import feint.renderer.Renderer.RendererPrimitiveOptions;
 import feint.renderer.RenderContext.RenderAPI;
 
-class CanvasRenderContext implements RenderContext2D {
+class CanvasRenderContext implements RenderContext {
   public var api(default, null):RenderAPI;
   public var width(default, null):Int;
   public var height(default, null):Int;
@@ -51,7 +51,7 @@ class CanvasRenderContext implements RenderContext2D {
   public function resize(width:Int, height:Int) {
     throw new FeintException(
       'NotImplemented',
-      "RenderContext2D.resize() not implemented for Canvas"
+      "RenderContext.resize() not implemented for Canvas"
     );
   }
 
