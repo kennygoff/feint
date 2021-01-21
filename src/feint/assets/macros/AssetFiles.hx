@@ -35,6 +35,9 @@ class AssetFiles {
       final value = relativePath;
       #end
 
+      if (fields.exists(field -> field.name == name)) {
+        continue;
+      }
       fields.push({
         name: name,
         doc: 'Relative path for file ${file}',

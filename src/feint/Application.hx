@@ -1,5 +1,6 @@
 package feint;
 
+import feint.renderer.RenderContext.RenderAPI;
 import feint.debug.Logger;
 import feint.debug.FeintException;
 import feint.renderer.Renderer;
@@ -27,6 +28,13 @@ typedef ApplicationSettings = {
     var width:Int;
     var height:Int;
   };
+
+  /**
+   * Specify a particular Render API to use.
+   *
+   * JS target defaults to `RenderAPI.Canvas`.
+   */
+  var ?api:RenderAPI;
 }
 
 /**
@@ -134,7 +142,7 @@ class Application {
    * @param settings Settings used by Application to startup application and window
    */
   function setup(settings:ApplicationSettings) {
-    window = new Window(settings.title, settings.size.width, settings.size.height);
+    window = new Window(settings.title, settings.size.width, settings.size.height, settings.api);
     renderer = new Renderer(window.renderContext);
     game = new Game(renderer, window);
   }
