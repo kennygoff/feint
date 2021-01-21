@@ -146,7 +146,7 @@ class WebGLRenderContext implements RenderContext2D {
     y:Int,
     assetId:String,
     ?clip:TextureClip,
-    ?scale:Float,
+    ?scale:Float = 1,
     ?textureWidth:Int,
     ?textureHeight:Int
   ) {
@@ -172,11 +172,12 @@ class WebGLRenderContext implements RenderContext2D {
         textureWidth != null &&
         textureHeight != null &&
         isPowerOf2(textureWidth) &&
-        isPowerOf2(textureHeight)
+        isPowerOf2(textureHeight) &&
+        scale == 1
       ) {
         // Yes, it's a power of 2. Generate mips.
         context.generateMipmap(RenderingContext.TEXTURE_2D);
-      } else if (clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height)) {
+      } else if (clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height) && scale == 1) {
         context.generateMipmap(RenderingContext.TEXTURE_2D);
       } else {
         // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
@@ -193,7 +194,12 @@ class WebGLRenderContext implements RenderContext2D {
         context.texParameteri(
           RenderingContext.TEXTURE_2D,
           RenderingContext.TEXTURE_MIN_FILTER,
-          RenderingContext.LINEAR
+          RenderingContext.NEAREST // LINEAR for non-pixel art
+        );
+        context.texParameterf(
+          RenderingContext.TEXTURE_2D,
+          RenderingContext.TEXTURE_MAG_FILTER,
+          RenderingContext.NEAREST
         );
       }
     }
@@ -217,7 +223,7 @@ class WebGLRenderContext implements RenderContext2D {
       stride,
       offset
     );
-    setRectangle(context, x, y, clip.width, clip.height);
+    setRectangle(context, x, y, clip.width * scale, clip.height * scale);
 
     context.enableVertexAttribArray(defaultTextureCoordinateAttributionLocation);
     context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
