@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "sandbox:debug",
+      "isBackground": true,
+      "label": "[Feint] Sandbox Server",
+      "problemMatcher": {
+        "pattern": {
+          // https://stackoverflow.com/a/54017304
+          "regexp": ".*",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": ".*Server running.*"
+        }
+      }
+    },
+    {
+      // https://github.com/microsoft/vscode/issues/24779
+      // https://github.com/microsoft/vscode/issues/109091
+      "label": "[Feint] Kill Task",
+      "type": "process",
+      "command": [
+        "${command:workbench.action.tasks.terminate}",
+        "${command:workbench.action.acceptSelectedQuickOpenItem}"
+      ]
+    },
+    {
+      "type": "haxe",
+      "args": "active configuration",
+      "problemMatcher": [
+        "$haxe-absolute",
+        "$haxe",
+        "$haxe-error",
+        "$haxe-trace"
+      ],
+      "group": "build",
+      "label": "haxe: active configuration"
+    }
+  ]
+}

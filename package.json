@@ -13,6 +13,7 @@
     "docs:open": "open docs/pages/index.html",
     "docs:deploy": "NETLIFY_SITE_ID=c8e9d52b-8a3b-4e14-9aa0-643c95d4222f netlify deploy --dir=docs/pages --prod",
     "sandbox": "haxe sandbox.build.hxml",
+    "sandbox:debug": "yarn sandbox:serve",
     "sandbox:start": "concurrently --kill-others \"yarn sandbox:watch\" \"yarn sandbox:serve\"",
     "sandbox:watch": "haxe sandbox.build.hxml && fswatch -o src sandbox/src | xargs -n1 -I{} haxe sandbox.build.hxml",
     "sandbox:serve": "parcel sandbox/build/web/index.html -d sandbox/build/web/parcel/output --cache-dir sandbox/build/web/parcel/cache"
