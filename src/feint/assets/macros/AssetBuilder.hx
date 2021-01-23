@@ -28,6 +28,15 @@ class AssetBuilder {
     final assetsDstFolder = Path.join([cwd, projectRoot, "build/web", "assets"]);
 
     Sys.println("\033[1m\033[38;5;6m[Feint]\033[m \033[38;5;6mAsset Builder running...\033[m");
+
+    if (!FileSystem.exists(assetSrcFolder)) {
+      Sys.println("  No assets folder found at: ");
+      Sys.println("    " + assetSrcFolder);
+      Sys.println("  Skipping asset builder.");
+      Sys.println("\033[1m\033[38;5;6m[Feint]\033[m \033[38;5;6mAsset Builder finished!\033[m");
+      return [];
+    }
+
     Sys.println("  Copying assets from ");
     Sys.println("    " + assetSrcFolder);
     Sys.println("  to:");
