@@ -67,7 +67,5 @@ class SandboxScene extends Scene {
     renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
 
     forge.render(renderer);
-
-    renderer.drawText(0, 0, 'FPS: ${game.fps}', 16, 'sans-serif');
   }
 }

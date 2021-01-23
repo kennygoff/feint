@@ -119,6 +119,15 @@ class AssetBuilder {
           font-smooth: never;
           -webkit-font-smoothing: none;
         }
+        ::if debug::
+        #debug-ui {
+          position: absolute;
+          top: 0;
+          left: 0;
+          background: transparent;
+          z-index: 2; /*  */
+        }
+        ::end::
       </style>
     </head>
     <body>

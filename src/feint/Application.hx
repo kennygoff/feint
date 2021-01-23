@@ -94,9 +94,31 @@ class Application {
   static var application:Application;
 
   /**
+   * Timestamp of the start of the application. Primarily used for fps
+   * calculation and debugging.
+   */
+  var startTimestamp(default, null):Float;
+
+  /**
    * Timestamp of the last frame we processed, used to calulate elapsed time.
    */
-  var lastTime:Float = 0;
+  var lastFrameTimestamp(default, null):Float = 0;
+
+  /**
+   * Number of frames that have been processed since the application has
+   * started. Primarily used for fps calculation and debugging.
+   */
+  var framesProcessed(default, null):Int;
+
+  /**
+   * Rolling average FPS
+   */
+  public var fps(default, null):Float;
+
+  /**
+   * Average FPS for the entire lifetime of the application
+   */
+  public var lifetimeFPS(default, null):Float;
 
   /**
    * Creates a Feint Application, initializes a `Window` and `Game`, and starts
@@ -145,6 +167,8 @@ class Application {
     window = new Window(settings.title, settings.size.width, settings.size.height, settings.api);
     renderer = new Renderer(window.renderContext);
     game = new Game(renderer, window);
+    @:privateAccess(Game)
+    game.application = this;
   }
 
   /**
@@ -186,8 +210,16 @@ class Application {
    */
   function requestFirstFrame() {
     #if js
+    framesProcessed = 0;
+    startTimestamp = 0;
+    lifetimeFPS = 0;
+    fps = 0;
     js.Browser.window.requestAnimationFrame((timestamp:Float) -> {
-      lastTime = timestamp;
+      lastFrameTimestamp = timestamp;
+      framesProcessed = 0;
+      fps = 0;
+      lifetimeFPS = 0;
+      startTimestamp = timestamp;
       requestFrame();
     });
     #else
@@ -230,8 +262,11 @@ class Application {
    * @param timestamp [milliseconds] Current time in seconds
    */
   function onFrame(timestamp:Float) {
-    var elapsed = timestamp - lastTime;
-    lastTime = timestamp;
+    framesProcessed++;
+    var elapsed = timestamp - lastFrameTimestamp;
+    lastFrameTimestamp = timestamp;
+    lifetimeFPS = 1000 * framesProcessed / (timestamp - startTimestamp);
+    fps = (0.95 * fps) + (0.05 * (1000 / elapsed));
     update(elapsed);
     render(renderer);
 

@@ -1,5 +1,7 @@
 package feint;
 
+import feint.input.device.Keyboard.KeyCode;
+import feint.renderer.backends.WebGLRenderContext;
 import feint.debug.Logger;
 import feint.scene.Scene;
 import feint.renderer.Renderer;
@@ -35,20 +37,38 @@ class Game {
   public var window(default, null):Window;
 
   /**
-   * Rough FPS calculation based on the last frame time.
-   * <p>
-   *   **Note:** Not an average! This is simply the time since the last frame
-   *   in the FPS format.
-   * </p>
+   * Reference to the global application this game runs in.
+   */
+  public var application(default, null):Application;
+
+  /**
+   * Average fps, rounded to nearest integer.
+   *
+   * @deprecated Use application.fps directly
    */
   // TODO: Frame info
   // TODO: Deterministic semi-fixed frame rate https://gafferongames.com/post/fix_your_timestep/
-  public var fps(default, null):Int;
+  public var fps(get, null):Int;
 
   /**
    * [milliseconds] Amount of time passed since the last frame was processed.
    */
-  public var frameTime(default, null):Float;
+  public var frameElapsed(default, null):Float;
+
+  /**
+   * Amount of time it took to update this frame.
+   */
+  public var frameUpdateTime(default, null):Float = 0;
+
+  /**
+   * Amount of time it took to render this frame.
+   */
+  public var frameRenderTime(default, null):Float = 0;
+
+  /**
+   * Toggle to show debug UI with backtick `\``
+   */
+  var showDebugUI:Bool = false;
 
   /**
    * Renderer used in the render call every frame, attached to the window's
@@ -78,6 +98,10 @@ class Game {
    * 3. Call update for `Game.activeScene`
    */
   public function update(elapsed:Float) {
+    #if debug
+    var updateTime = Date.now().getTime();
+    #end
+
     // Always swap to nextScene before continuing with any updates
     // TODO: Consider moving to a preupdate function
     if (nextScene != null) {
@@ -86,12 +110,18 @@ class Game {
       nextScene = null;
     }
 
-    frameTime = elapsed;
-    fps = Math.round(1000 / frameTime);
+    frameElapsed = elapsed;
 
     if (activeScene != null) {
       activeScene.update(elapsed);
     }
+
+    #if debug
+    if (window.inputManager.keyboard.keys[KeyCode.Backtick] == JustPressed) {
+      showDebugUI = !showDebugUI;
+    }
+    frameUpdateTime = Date.now().getTime() - updateTime;
+    #end
   }
 
   /**
@@ -103,11 +133,37 @@ class Game {
    * 2. Call render for `Game.activeScene`
    */
   public function render() {
+    #if debug
+    var renderTime = Date.now().getTime();
+    #end
+
     renderer.clear();
 
     if (activeScene != null) {
       activeScene.render(renderer);
     }
+
+    #if debug
+    frameRenderTime = Date.now().getTime() - renderTime;
+    #end
+
+    #if debug
+    // TODO: Move to debug UI
+    if (showDebugUI) {
+      @:privateAccess(Renderer)
+      if (renderer.renderContext.api == WebGL) {
+        var webGLRenderContext:WebGLRenderContext = cast renderer.renderContext;
+        @:privateAccess(WebGLRenderContext)
+        webGLRenderContext.textRenderContext.drawRect(0, 0, 150, 60, {color: 0x99000000});
+      } else {
+        renderer.drawRect(4, 4, 130, 62, {color: 0xBB000000});
+      }
+
+      renderer.drawText(8, 8 + 2, 'FPS: ${fps}', 16, 'sans-serif');
+      renderer.drawText(8, 8 + 2 + (18 * 1), 'Update: ${frameUpdateTime}ms', 16, 'sans-serif');
+      renderer.drawText(8, 8 + 2 + (18 * 2), 'Render: ${frameRenderTime}ms', 16, 'sans-serif');
+    }
+    #end
   }
 
   /**
@@ -137,5 +193,15 @@ class Game {
     nextScene.game = this;
     nextScene.init();
     return activeScene;
+  }
+
+  /**
+   * Get rounded fps value for simple display
+   * @return Int
+   *
+   * @deprecated Use application.fps directly
+   */
+  public function get_fps():Int {
+    return Math.round(application.fps);
   }
 }

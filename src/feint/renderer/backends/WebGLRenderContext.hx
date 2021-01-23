@@ -51,7 +51,7 @@ class WebGLRenderContext implements RenderContext {
   public function new(canvas:CanvasElement, context:RenderingContext, width:Int, height:Int) {
     this.width = width;
     this.height = height;
-    this.api = Canvas;
+    this.api = WebGL;
     this.canvas = canvas;
     this.context = context;
     setup();
