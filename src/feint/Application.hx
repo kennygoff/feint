@@ -96,7 +96,7 @@ class Application {
   /**
    * Timestamp of the last frame we processed, used to calulate elapsed time.
    */
-  var lastTime:Float;
+  var lastTime:Float = 0;
 
   /**
    * Creates a Feint Application, initializes a `Window` and `Game`, and starts
@@ -175,7 +175,28 @@ class Application {
    * **WARNING:** Do not override, used internally by Application only.
    */
   function start() {
-    requestFrame();
+    requestFirstFrame();
+  }
+
+  /**
+   * Setup frame requests, first frame request takes some time and is choppy so
+   * let it stabilize
+   *
+   * **WARNING:** Do not override, used internally by Application only.
+   */
+  function requestFirstFrame() {
+    #if js
+    js.Browser.window.requestAnimationFrame((timestamp:Float) -> {
+      lastTime = timestamp;
+      requestFrame();
+    });
+    #else
+    Logger.error('This platform is not supported.');
+    throw new FeintException(
+      'PlatformNotSupported',
+      'Error running Application.start()! This platform is not supported. The currently supported platform is js.'
+    );
+    #end
   }
 
   /**

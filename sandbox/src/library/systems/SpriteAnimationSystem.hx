@@ -18,9 +18,7 @@ class SpriteAnimationSystem extends System {
 
     var animatedSprites = sprites.filter(sprite -> sprite.sprite.sprite.animation != null);
     for (animatedSprite in animatedSprites) {
-      if (!Math.isNaN(elapsed)) {
-        animatedSprite.sprite.sprite.animation.update(elapsed);
-      }
+      animatedSprite.sprite.sprite.animation.update(elapsed);
     }
   }
 }
