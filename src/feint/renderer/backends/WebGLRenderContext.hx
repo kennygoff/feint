@@ -1,5 +1,6 @@
 package feint.renderer.backends;
 
+import js.html.URL;
 import js.html.CanvasRenderingContext2D;
 import js.html.ImageElement;
 import js.html.Image;
@@ -42,7 +43,8 @@ class WebGLRenderContext implements RenderContext {
   var defaultPositionBuffer:Buffer;
   var defaultResolutionUniformLocation:UniformLocation;
   var defaultColorUniformLocation:UniformLocation;
-  var textureBound:Map<String, Bool> = [];
+  var textureBound:Map<String, ImageElement> = [];
+  var textureLoading:Map<String, Bool> = [];
   var textCanvas:CanvasElement;
   var textRenderContext:CanvasRenderContext;
 
@@ -152,12 +154,22 @@ class WebGLRenderContext implements RenderContext {
     ?textureHeight:Int
   ) {
     if (textureBound[assetId] == null) {
-      var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
-      var image = new Image();
-      image.src = imageElem.src;
-      image.addEventListener('load', () -> {
-        textureBound[assetId] = true;
-      });
+      if (textureLoading[assetId] == null) {
+        var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
+        var image = new Image();
+        if (imageElem.src.indexOf('file://') == 0) {
+          throw new FeintException(
+            'INVALID_FILESYSTEM_ACCESS',
+            'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
+          );
+        }
+        requestCORSIfNotSameOrigin(image, imageElem.src);
+        image.src = imageElem.src;
+        image.addEventListener('load', () -> {
+          textureLoading[assetId] = true;
+          textureBound[assetId] = image;
+        });
+      }
     } else {
       context.bindTexture(RenderingContext.TEXTURE_2D, defaultTexture);
       context.texImage2D(
@@ -166,7 +178,7 @@ class WebGLRenderContext implements RenderContext {
         RenderingContext.RGBA,
         RenderingContext.RGBA,
         RenderingContext.UNSIGNED_BYTE,
-        cast js.Browser.document.getElementById(assetId)
+        textureBound[assetId]
       );
       // context.generateMipmap(RenderingContext.TEXTURE_2D);
       if (
@@ -507,5 +519,24 @@ class WebGLRenderContext implements RenderContext {
 
   static inline function isPowerOf2(value:Int) {
     return (value & (value - 1)) == 0;
+  }
+
+  /**
+   * Make CORS anonymous for loaded images.
+   *
+   * Testing by just opening an html file will not work without this but in a
+   * real production version we should probably not do this.
+   * @param img
+   * @param url
+   * @see https://webglfundamentals.org/webgl/lessons/webgl-cors-permission.html
+   */
+  function requestCORSIfNotSameOrigin(img, url) {
+    var notOrigin = (new URL(
+      url,
+      js.Browser.window.location.href
+    )).origin != js.Browser.window.location.origin;
+    if (notOrigin) {
+      img.crossOrigin = "anonymous";
+    }
   }
 }

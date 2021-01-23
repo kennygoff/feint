@@ -7,10 +7,7 @@
       "name": "Launch Chrome against localhost",
       "url": "file://${workspaceFolder}/sandbox/build/web/index.html",
       "webRoot": "${workspaceFolder}",
-      "preLaunchTask": {
-        "type": "haxe",
-        "args": "active configuration"
-      }
+      "preLaunchTask": "[Feint] Build Sandbox"
     },
     {
       "name": "[Feint] Sandbox Chrome Debugger",

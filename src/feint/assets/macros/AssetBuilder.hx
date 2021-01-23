@@ -124,7 +124,7 @@ class AssetBuilder {
     <body>
       ::foreach preloadedAssets::
         ::if (type == "image")::
-          <img id="::id::" src="::relativePath::" style="display: none;" />
+          <img id="::id::" src="::relativePath::" style="display: none;"/>
         ::elseif (type == "font")::
         ::elseif (type == "audio")::
           <audio id="::id::" src="::relativePath::" preload="auto" style="display: none;" />

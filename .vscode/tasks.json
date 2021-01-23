@@ -3,12 +3,16 @@
   "tasks": [
     {
       "type": "npm",
+      "script": "sandbox",
+      "label": "[Feint] Build Sandbox"
+    },
+    {
+      "type": "npm",
       "script": "sandbox:debug",
       "isBackground": true,
       "label": "[Feint] Sandbox Server",
       "problemMatcher": {
         "pattern": {
-          // https://stackoverflow.com/a/54017304
           "regexp": ".*",
           "file": 1,
           "location": 2,
@@ -22,8 +26,6 @@
       }
     },
     {
-      // https://github.com/microsoft/vscode/issues/24779
-      // https://github.com/microsoft/vscode/issues/109091
       "label": "[Feint] Kill Task",
       "type": "process",
       "command": [
