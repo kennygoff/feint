@@ -1,11 +1,17 @@
 package feint.forge;
 
+import haxe.rtti.Meta;
+
 using Lambda;
 
 import feint.forge.System.RenderSystem;
 import feint.forge.Entity;
 import feint.forge.Component;
 import feint.renderer.Renderer;
+
+typedef ComponentClassMetadata = {
+  shape:Array<String>
+}
 
 class Forge {
   var entities:Array<EntityId> = [];
@@ -150,6 +156,26 @@ class Forge {
 
   public function addRenderSystem(system:RenderSystem) {
     renderSystems.push(system);
+  }
+
+  public function getShapes(componentClassNames:Array<ComponentType>):Array<Dynamic> {
+    var entities = this.getEntities(componentClassNames);
+    return entities.map(entityId -> {
+      var object:Dynamic = {
+        id: entityId
+      };
+      for (className in componentClassNames) {
+        var componentClass = Type.resolveClass(className);
+        var meta:ComponentClassMetadata = cast Meta.getType(Type.resolveClass(className));
+        Reflect.setField(
+          object, meta != null && meta.shape != null && meta.shape.length > 0 ? meta.shape[0] : Type.getClassName(
+            componentClass
+          ),
+          this.getEntityComponent(entityId, componentClass)
+        );
+      }
+      return object;
+    });
   }
 
   public function destroy() {

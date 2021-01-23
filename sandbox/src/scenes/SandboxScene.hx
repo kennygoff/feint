@@ -1,28 +1,43 @@
 package scenes;
 
+import library.systems.SpriteRenderSystem;
+import library.systems.SpriteAnimationSystem;
+import library.components.SpriteComponent;
+import library.components.HitboxComponent;
+import library.components.PositionComponent;
+import feint.forge.Entity;
+import feint.forge.Forge;
 import feint.graphics.Sprite;
 import feint.assets.Assets;
 import feint.renderer.Renderer;
 import feint.scene.Scene;
 
 class SandboxScene extends Scene {
-  var sprite:Sprite;
+  var forge:Forge;
 
   override function init() {
     super.init();
-    sprite = new Sprite(Assets.platformer_character__png);
+
+    var sprite = new Sprite(Assets.platformer_character__png);
     sprite.textureWidth = 384;
     sprite.textureHeight = 192;
     sprite.setupSpriteSheetAnimation(96, 96, ['idle' => [0], 'jump' => [1], 'run' => [2, 3]]);
     sprite.animation.play('run', 30, true);
+
+    forge = new Forge();
+    forge.addEntity(Entity.create(), [
+      new PositionComponent(0, 0),
+      new HitboxComponent(0, 0, 96, 96),
+      new SpriteComponent(sprite)
+    ]);
+    forge.addSystem(new SpriteAnimationSystem());
+    forge.addRenderSystem(new SpriteRenderSystem());
   }
 
   override function update(elapsed:Float) {
     super.update(elapsed);
 
-    if (!Math.isNaN(elapsed)) {
-      sprite.animation.update(elapsed);
-    }
+    forge.update(elapsed);
   }
 
   override function render(renderer:Renderer) {
@@ -51,7 +66,7 @@ class SandboxScene extends Scene {
     });
     renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
 
-    sprite.drawAt(0, 0, renderer);
+    forge.render(renderer);
 
     renderer.drawText(0, 0, 'FPS: ${game.fps}', 16, 'sans-serif');
   }
