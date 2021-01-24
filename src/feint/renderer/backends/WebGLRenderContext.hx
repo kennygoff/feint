@@ -87,10 +87,11 @@ class WebGLRenderContext implements RenderContext {
 
   public function submit() {
     rectShader.use(context);
-    for (rect in rectShader.rects) {
-      rectShader.currentRect = rect;
-      rectShader.draw(context);
-    }
+    rectShader.draw(context);
+    // for (rect in rectShader.rects) {
+    //   rectShader.currentRect = rect;
+    //   rectShader.draw(context);
+    // }
   }
 
   public function resize(width:Int, height:Int) {

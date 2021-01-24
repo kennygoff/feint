@@ -1,5 +1,9 @@
 package feint.renderer.library;
 
+import feint.debug.Logger;
+
+using Lambda;
+
 import js.lib.Float32Array;
 import js.html.webgl.UniformLocation;
 import js.html.webgl.Buffer;
@@ -21,9 +25,9 @@ class RectWebGLShader extends WebGLShader {
   public var rects:Array<RectProperties>;
 
   var resolution:UniformLocation;
-  var color:UniformLocation;
+  var color:AttributeLocation;
   var position:AttributeLocation;
-  var positionBuffer:Buffer;
+  var buffer:Buffer;
 
   public function new() {
     this.rects = [];
@@ -32,10 +36,15 @@ class RectWebGLShader extends WebGLShader {
   override public function load() {
     vertexShaderSource = '
       attribute vec2 a_position;
+      attribute vec4 a_color;
 
       uniform vec2 u_resolution;
+
+      varying vec4 v_color;
       
       void main() {
+        v_color = a_color;
+
         // convert the position from pixels to 0.0 to 1.0
         vec2 zeroToOne = a_position / u_resolution;
     
@@ -52,10 +61,10 @@ class RectWebGLShader extends WebGLShader {
     fragmentShaderSource = '
       precision mediump float;
 
-      uniform vec4 u_color;
+      varying vec4 v_color;
 
       void main() {
-        gl_FragColor = u_color;
+        gl_FragColor = v_color;
       }
     ';
 
@@ -65,55 +74,127 @@ class RectWebGLShader extends WebGLShader {
     super.compile(context);
 
     position = context.getAttribLocation(program, 'a_position');
+    color = context.getAttribLocation(program, 'a_color');
     resolution = context.getUniformLocation(program, 'u_resolution');
-    color = context.getUniformLocation(program, 'u_color');
 
-    positionBuffer = context.createBuffer();
+    buffer = context.createBuffer();
   }
 
   override public function globals(context:RenderingContext) {}
 
   override public function draw(context:RenderingContext) {
-    super.draw(context);
-
     // Global uniforms, won't change per instance
     // TODO: Move to use()
     context.uniform2f(resolution, context.canvas.width, context.canvas.height);
 
-    // Attributes
-    context.enableVertexAttribArray(position);
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, positionBuffer);
-    var size = 2; // 2 components per iteration
-    var type = RenderingContext.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    context.vertexAttribPointer(position, size, type, normalize, stride, offset);
+    // Vertex Buffer Object
+    context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
 
+    // Vertex Positions
+    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 24, 0);
+    context.enableVertexAttribArray(position);
+
+    // Vertex Colors
+    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 24, 8);
+    context.enableVertexAttribArray(color);
+
+    #if (debug && false)
+    // Profiling for adding data to the buffer
+    // TERRIBLE PERF: concat() * rect
+    // OKAY PERF: push() * rect * count
+    // TODO: Keep vertices stored in a format we don't have to do much
+    // modification to before the draw call
+    var time = Date.now().getTime();
+    #end
+
+    // Vertex Data
+    var bufferData:Array<Float> = [];
+    for (rect in rects) {
+      pushRectToBufferData(bufferData, rect);
+    }
+    context.bufferData(
+      RenderingContext.ARRAY_BUFFER,
+      new js.lib.Float32Array(bufferData),
+      RenderingContext.STATIC_DRAW
+    );
+
+    #if (debug && false)
+    trace('Data Prep Time: ${Date.now().getTime() - time}');
+    #end
+
+    // Draw vertices from vertex buffer
     var primitiveType = RenderingContext.TRIANGLES;
     var offset = 0;
-    var count = 6;
-    setRectangle(context, currentRect.x, currentRect.y, currentRect.width, currentRect.height);
-
-    var colorVec4 = colorToVec4(currentRect.color);
-
-    context.uniform4fv(color, colorVec4);
+    var count = 6 * rects.length;
+    if (count > 65000) {
+      // TODO: Determine size allowed for machine
+      // TODO: Send in multiple batches if larger
+      Logger.warn('Nearing WebGL limit of vertices! ${count}/65535');
+    }
     context.drawArrays(primitiveType, offset, count);
   }
 
-  function setRectangle(context:RenderingContext, x:Float, y:Float, width:Float, height:Float) {
-    var x1 = x;
-    var x2 = x + width;
-    var y1 = y;
-    var y2 = y + height;
-    context.bufferData(RenderingContext.ARRAY_BUFFER, new js.lib.Float32Array([
-      x1, y1,
-      x2, y1,
-      x1, y2,
-      x1, y2,
-      x2, y1,
-      x2, y2
-    ]), RenderingContext.STATIC_DRAW);
+  function pushRectToBufferData(bufferData:Array<Float>, rect:RectProperties) {
+    var x1 = rect.x;
+    var x2 = rect.x + rect.width;
+    var y1 = rect.y;
+    var y2 = rect.y + rect.height;
+    var color = colorToVec4(rect.color);
+    bufferData.push(x1);
+    bufferData.push(y1);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+    bufferData.push(x2);
+    bufferData.push(y1);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+    bufferData.push(x1);
+    bufferData.push(y2);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+    bufferData.push(x1);
+    bufferData.push(y2);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+    bufferData.push(x2);
+    bufferData.push(y1);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+    bufferData.push(x2);
+    bufferData.push(y2);
+    bufferData.push(color[0]);
+    bufferData.push(color[1]);
+    bufferData.push(color[2]);
+    bufferData.push(color[3]);
+  }
+
+  /**
+   * Not used currently, but useful
+   */
+  function rectToVertices(rect:RectProperties):Array<Float> {
+    var x1 = rect.x;
+    var x2 = rect.x + rect.width;
+    var y1 = rect.y;
+    var y2 = rect.y + rect.height;
+    var color = colorToVec4(rect.color);
+    return [
+      x1, y1, color[0], color[1], color[2], color[3],
+      x2, y1, color[0], color[1], color[2], color[3],
+      x1, y2, color[0], color[1], color[2], color[3],
+      x1, y2, color[0], color[1], color[2], color[3],
+      x2, y1, color[0], color[1], color[2], color[3],
+      x2, y2, color[0], color[1], color[2], color[3],
+    ];
   }
 
   static inline function colorToVec4(color:Int):Float32Array {

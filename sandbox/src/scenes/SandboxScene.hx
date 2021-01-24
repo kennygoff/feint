@@ -28,7 +28,7 @@ class SandboxScene extends Scene {
     super.init();
 
     rects = [
-      for (i in 0...3000)
+      for (i in 0...10000)
         {
           x: Math.floor(Math.random() * game.window.width),
           y: Math.floor(Math.random() * game.window.height),
