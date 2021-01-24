@@ -101,22 +101,16 @@ class RectWebGLShader extends WebGLShader {
     #if (debug && false)
     // Profiling for adding data to the buffer
     // TERRIBLE PERF: concat() * rect
-    // OKAY PERF: push() * rect * count
+    // MEH PERF: push() * rect * count
+    // OKAY PERF: Float32Array(size), buffer[i] = val
     // TODO: Keep vertices stored in a format we don't have to do much
     // modification to before the draw call
     var time = Date.now().getTime();
     #end
 
     // Vertex Data
-    var bufferData:Array<Float> = [];
-    for (rect in rects) {
-      pushRectToBufferData(bufferData, rect);
-    }
-    context.bufferData(
-      RenderingContext.ARRAY_BUFFER,
-      new js.lib.Float32Array(bufferData),
-      RenderingContext.STATIC_DRAW
-    );
+    var bufferData = rectsToBufferData(rects);
+    context.bufferData(RenderingContext.ARRAY_BUFFER, bufferData, RenderingContext.STATIC_DRAW);
 
     #if (debug && false)
     trace('Data Prep Time: ${Date.now().getTime() - time}');
@@ -134,6 +128,75 @@ class RectWebGLShader extends WebGLShader {
     context.drawArrays(primitiveType, offset, count);
   }
 
+  function rectsToBufferData(rects:Array<RectProperties>):Float32Array {
+    var verticesPerRect = 6;
+    var floatsPerVertex = 6;
+    var floatsInBuffer = rects.length * verticesPerRect * floatsPerVertex;
+    var bufferData = new js.lib.Float32Array(floatsInBuffer);
+    var bi = 0;
+    for (i in 0...rects.length) {
+      var x1 = rects[i].x;
+      var x2 = rects[i].x + rects[i].width;
+      var y1 = rects[i].y;
+      var y2 = rects[i].y + rects[i].height;
+      var color = colorToVec4(rects[i].color);
+
+      bufferData[bi++] = x1;
+      bufferData[bi++] = y1;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+
+      bufferData[bi++] = x2;
+      bufferData[bi++] = y1;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+
+      bufferData[bi++] = x1;
+      bufferData[bi++] = y2;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+
+      bufferData[bi++] = x1;
+      bufferData[bi++] = y2;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+
+      bufferData[bi++] = x2;
+      bufferData[bi++] = y1;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+
+      bufferData[bi++] = x2;
+      bufferData[bi++] = y2;
+      bufferData[bi++] = color[0];
+      bufferData[bi++] = color[1];
+      bufferData[bi++] = color[2];
+      bufferData[bi++] = color[3];
+    }
+    return bufferData;
+  }
+
+  /**
+   * Meh performance
+   *
+   * ```haxe
+   * var floatArr:Array<Float> = [];
+   * for (rect in rects) {
+   *   pushRectToBufferData(floatArr, rect);
+   * }
+   * var bufferData = new js.lib.Float32Array(floatArr);
+   * ```
+   */
   function pushRectToBufferData(bufferData:Array<Float>, rect:RectProperties) {
     var x1 = rect.x;
     var x2 = rect.x + rect.width;
