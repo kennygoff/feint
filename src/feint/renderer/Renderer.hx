@@ -62,4 +62,8 @@ class Renderer {
   ) {
     renderContext.drawImage(x, y, assetId, clip, scale, textureWidth, textureHeight);
   }
+
+  public function submit() {
+    renderContext.submit();
+  }
 }

@@ -19,6 +19,7 @@ interface RenderContext {
 
   public function clear(color:Int = 0xFF000000):Void;
   public function resize(width:Int, height:Int):Void;
+  public function submit():Void;
   public function drawRect(
     x:Int,
     y:Int,

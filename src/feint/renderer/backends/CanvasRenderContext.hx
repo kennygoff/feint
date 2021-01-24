@@ -48,6 +48,10 @@ class CanvasRenderContext implements RenderContext {
     drawRect(0, 0, canvas.width, canvas.height, {color: color});
   }
 
+  public function submit() {
+    // no-op
+  }
+
   public function resize(width:Int, height:Int) {
     throw new FeintException(
       'NotImplemented',

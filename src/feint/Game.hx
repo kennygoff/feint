@@ -143,6 +143,8 @@ class Game {
       activeScene.render(renderer);
     }
 
+    renderer.submit();
+
     #if debug
     frameRenderTime = Date.now().getTime() - renderTime;
     #end
@@ -154,7 +156,7 @@ class Game {
       if (renderer.renderContext.api == WebGL) {
         var webGLRenderContext:WebGLRenderContext = cast renderer.renderContext;
         @:privateAccess(WebGLRenderContext)
-        webGLRenderContext.textRenderContext.drawRect(0, 0, 150, 60, {color: 0x99000000});
+        webGLRenderContext.textRenderContext.drawRect(4, 4, 130, 62, {color: 0xBB000000});
       } else {
         renderer.drawRect(4, 4, 130, 62, {color: 0xBB000000});
       }

@@ -1,7 +1,7 @@
 package feint.renderer.backends;
 
+import feint.renderer.library.RectWebGLShader;
 import js.html.URL;
-import js.html.CanvasRenderingContext2D;
 import js.html.ImageElement;
 import js.html.Image;
 import js.lib.Uint8Array;
@@ -32,6 +32,9 @@ class WebGLRenderContext implements RenderContext {
 
   var canvas:CanvasElement;
   var context:RenderingContext;
+
+  // Default Shaders
+  var rectShader:RectWebGLShader;
 
   // TODO: Temp
   var defaultPositionAttributeLocation:Int;
@@ -78,7 +81,16 @@ class WebGLRenderContext implements RenderContext {
       textRenderContext.context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    submit();
+    rectShader.rects = [];
+    prepFrame();
+  }
+
+  public function submit() {
+    rectShader.use(context);
+    for (rect in rectShader.rects) {
+      rectShader.currentRect = rect;
+      rectShader.draw(context);
+    }
   }
 
   public function resize(width:Int, height:Int) {
@@ -86,7 +98,7 @@ class WebGLRenderContext implements RenderContext {
     // TODO: https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
   }
 
-  function submit() {
+  function prepFrame() {
     context.useProgram(defaultProgram);
     // context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
     // context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
@@ -113,35 +125,52 @@ class WebGLRenderContext implements RenderContext {
     height:Int,
     ?options:RendererPrimitiveOptions
   ) {
-    context.enableVertexAttribArray(defaultPositionAttributeLocation);
-    context.uniform1i(useTexture, 0);
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
-    var size = 2; // 2 components per iteration
-    var type = RenderingContext.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    context.vertexAttribPointer(
-      defaultPositionAttributeLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
+    rectShader.rects.push({
+      x: x,
+      y: y,
+      width: width,
+      height: height,
+      color: options != null && options.color != null ? options.color : 0xFFFFFFFF
+    });
+    // rectShader.use(context);
+    // rectShader.currentRect = {
+    //   x: x,
+    //   y: y,
+    //   width: width,
+    //   height: height,
+    //   color: options != null && options.color != null ? options.color : 0xFFFFFFFF
+    // };
+    // rectShader.draw(context);
 
-    var primitiveType = RenderingContext.TRIANGLES;
-    var offset = 0;
-    var count = 6;
-    setRectangle(context, x, y, width, height);
+    // context.enableVertexAttribArray(defaultPositionAttributeLocation);
+    // context.uniform1i(useTexture, 0);
+    // context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
+    // var size = 2; // 2 components per iteration
+    // var type = RenderingContext.FLOAT; // the data is 32bit floats
+    // var normalize = false; // don't normalize the data
+    // var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    // var offset = 0; // start at the beginning of the buffer
+    // context.vertexAttribPointer(
+    //   defaultPositionAttributeLocation,
+    //   size,
+    //   type,
+    //   normalize,
+    //   stride,
+    //   offset
+    // );
 
-    var color = (
-      options != null &&
-      options.color != null
-    ) ? colorToVec4(options.color) : cast [0, 1, 1, 1];
+    // var primitiveType = RenderingContext.TRIANGLES;
+    // var offset = 0;
+    // var count = 6;
+    // setRectangle(context, x, y, width, height);
 
-    context.uniform4f(defaultColorUniformLocation, color[0], color[1], color[2], color[3]);
-    context.drawArrays(primitiveType, offset, count);
+    // var color = (
+    //   options != null &&
+    //   options.color != null
+    // ) ? colorToVec4(options.color) : cast [0, 1, 1, 1];
+
+    // context.uniform4f(defaultColorUniformLocation, color[0], color[1], color[2], color[3]);
+    // context.drawArrays(primitiveType, offset, count);
   }
 
   public function drawImage(
@@ -153,6 +182,9 @@ class WebGLRenderContext implements RenderContext {
     ?textureWidth:Int,
     ?textureHeight:Int
   ) {
+    // TODO: Remove prepFrame call when drawImage has it's own shader program
+    prepFrame();
+
     if (textureBound[assetId] == null) {
       if (textureLoading[assetId] == null) {
         var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
@@ -404,6 +436,10 @@ class WebGLRenderContext implements RenderContext {
       RenderingContext.UNSIGNED_BYTE,
       new Uint8Array([0, 255, 255, 255])
     );
+
+    rectShader = new RectWebGLShader();
+    rectShader.load();
+    rectShader.compile(context);
 
     // Allows alpha blending for transparency in textures
     context.enable(RenderingContext.BLEND);
