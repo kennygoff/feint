@@ -1,4 +1,4 @@
-package feint.renderer.library;
+package feint.renderer.backends;
 
 import feint.debug.Logger;
 
@@ -12,7 +12,7 @@ import feint.renderer.backends.WebGLShader;
 
 typedef AttributeLocation = Int;
 
-typedef RectProperties = {
+typedef OldRectProperties = {
   var x:Float;
   var y:Float;
   var width:Float;
@@ -20,8 +20,12 @@ typedef RectProperties = {
   var color:Int;
 }
 
-class RectWebGLShader extends WebGLShader {
-  public var currentRect:RectProperties;
+typedef RectProperties = {
+  var positions:Array<Float>; // Vec2(XY)[x6]: Position of each vertex in the rect
+  var color:Array<Float>; // Vec4(ARGB): Flat color repeated for each position
+}
+
+class BatchRenderWebGLShader extends WebGLShader {
   public var rects:Array<RectProperties>;
 
   var resolution:UniformLocation;
@@ -98,7 +102,7 @@ class RectWebGLShader extends WebGLShader {
     context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 24, 8);
     context.enableVertexAttribArray(color);
 
-    #if (debug && false)
+    #if (debug)
     // Profiling for adding data to the buffer
     // TERRIBLE PERF: concat() * rect
     // MEH PERF: push() * rect * count
@@ -112,7 +116,7 @@ class RectWebGLShader extends WebGLShader {
     var bufferData = rectsToBufferData(rects);
     context.bufferData(RenderingContext.ARRAY_BUFFER, bufferData, RenderingContext.STATIC_DRAW);
 
-    #if (debug && false)
+    #if (debug)
     trace('Data Prep Time: ${Date.now().getTime() - time}');
     #end
 
@@ -128,6 +132,24 @@ class RectWebGLShader extends WebGLShader {
     context.drawArrays(primitiveType, offset, count);
   }
 
+  public function addRect(x:Float, y:Float, width:Float, height:Float, color:Int) {
+    var x1 = x;
+    var x2 = x + width;
+    var y1 = y;
+    var y2 = y + height;
+    rects.push({
+      positions: [
+        x1, y1,
+        x2, y1,
+        x1, y2,
+        x1, y2,
+        x2, y1,
+        x2, y2
+      ],
+      color: cast colorToVec4(color)
+    });
+  }
+
   function rectsToBufferData(rects:Array<RectProperties>):Float32Array {
     var verticesPerRect = 6;
     var floatsPerVertex = 6;
@@ -135,116 +157,55 @@ class RectWebGLShader extends WebGLShader {
     var bufferData = new js.lib.Float32Array(floatsInBuffer);
     var bi = 0;
     for (i in 0...rects.length) {
-      var x1 = rects[i].x;
-      var x2 = rects[i].x + rects[i].width;
-      var y1 = rects[i].y;
-      var y2 = rects[i].y + rects[i].height;
-      var color = colorToVec4(rects[i].color);
+      bufferData[bi++] = rects[i].positions[0];
+      bufferData[bi++] = rects[i].positions[1];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
 
-      bufferData[bi++] = x1;
-      bufferData[bi++] = y1;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
+      bufferData[bi++] = rects[i].positions[2];
+      bufferData[bi++] = rects[i].positions[3];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
 
-      bufferData[bi++] = x2;
-      bufferData[bi++] = y1;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
+      bufferData[bi++] = rects[i].positions[4];
+      bufferData[bi++] = rects[i].positions[5];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
 
-      bufferData[bi++] = x1;
-      bufferData[bi++] = y2;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
+      bufferData[bi++] = rects[i].positions[6];
+      bufferData[bi++] = rects[i].positions[7];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
 
-      bufferData[bi++] = x1;
-      bufferData[bi++] = y2;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
+      bufferData[bi++] = rects[i].positions[8];
+      bufferData[bi++] = rects[i].positions[9];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
 
-      bufferData[bi++] = x2;
-      bufferData[bi++] = y1;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
-
-      bufferData[bi++] = x2;
-      bufferData[bi++] = y2;
-      bufferData[bi++] = color[0];
-      bufferData[bi++] = color[1];
-      bufferData[bi++] = color[2];
-      bufferData[bi++] = color[3];
+      bufferData[bi++] = rects[i].positions[10];
+      bufferData[bi++] = rects[i].positions[11];
+      bufferData[bi++] = rects[i].color[0];
+      bufferData[bi++] = rects[i].color[1];
+      bufferData[bi++] = rects[i].color[2];
+      bufferData[bi++] = rects[i].color[3];
     }
     return bufferData;
   }
 
   /**
-   * Meh performance
-   *
-   * ```haxe
-   * var floatArr:Array<Float> = [];
-   * for (rect in rects) {
-   *   pushRectToBufferData(floatArr, rect);
-   * }
-   * var bufferData = new js.lib.Float32Array(floatArr);
-   * ```
-   */
-  function pushRectToBufferData(bufferData:Array<Float>, rect:RectProperties) {
-    var x1 = rect.x;
-    var x2 = rect.x + rect.width;
-    var y1 = rect.y;
-    var y2 = rect.y + rect.height;
-    var color = colorToVec4(rect.color);
-    bufferData.push(x1);
-    bufferData.push(y1);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-    bufferData.push(x2);
-    bufferData.push(y1);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-    bufferData.push(x1);
-    bufferData.push(y2);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-    bufferData.push(x1);
-    bufferData.push(y2);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-    bufferData.push(x2);
-    bufferData.push(y1);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-    bufferData.push(x2);
-    bufferData.push(y2);
-    bufferData.push(color[0]);
-    bufferData.push(color[1]);
-    bufferData.push(color[2]);
-    bufferData.push(color[3]);
-  }
-
-  /**
    * Not used currently, but useful
    */
-  function rectToVertices(rect:RectProperties):Array<Float> {
+  function rectToVertices(rect:OldRectProperties):Array<Float> {
     var x1 = rect.x;
     var x2 = rect.x + rect.width;
     var y1 = rect.y;
