@@ -1,19 +1,18 @@
 package feint.renderer.backends;
 
-import feint.utils.Math;
-import feint.debug.FeintException;
-import js.lib.Uint8Array;
-import js.html.ImageElement;
-import js.html.webgl.Texture;
-import feint.debug.Logger;
-
 using Lambda;
 
-import js.lib.Float32Array;
-import js.html.webgl.UniformLocation;
+import js.html.ImageElement;
 import js.html.webgl.Buffer;
 import js.html.webgl.RenderingContext;
+import js.html.webgl.Texture;
+import js.html.webgl.UniformLocation;
+import js.lib.Uint8Array;
+import js.lib.Float32Array;
+import feint.debug.FeintException;
+import feint.debug.Logger;
 import feint.renderer.backends.WebGLShader;
+import feint.utils.Math;
 
 typedef AttributeLocation = Int;
 

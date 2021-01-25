@@ -1,20 +1,16 @@
 package feint.renderer.backends;
 
-import feint.renderer.backends.BatchRenderWebGLShader;
-import js.html.URL;
-import js.html.ImageElement;
+import js.html.CanvasElement;
 import js.html.Image;
+import js.html.ImageElement;
+import js.html.URL;
+import js.html.webgl.RenderingContext;
 import feint.debug.FeintException;
-import js.lib.Float32Array;
-import feint.debug.Logger;
 import feint.renderer.Renderer.TextureClip;
 import feint.renderer.Renderer.TextAlign;
 import feint.renderer.Renderer.RendererPrimitiveOptions;
-import js.html.webgl.RenderingContext;
-import js.html.webgl.Program;
-import js.html.webgl.Shader;
-import js.html.CanvasElement;
 import feint.renderer.RenderContext.RenderAPI;
+import feint.renderer.backends.BatchRenderWebGLShader;
 
 enum abstract WebGLShaderType(Int) to Int {
   var Vertex = RenderingContext.VERTEX_SHADER;
