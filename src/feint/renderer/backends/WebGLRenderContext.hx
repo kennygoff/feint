@@ -33,8 +33,11 @@ class WebGLRenderContext implements RenderContext {
   var canvas:CanvasElement;
   var context:RenderingContext;
 
-  // Default Shaders
+  // Batch Renderer
   var batchRender:BatchRenderWebGLShader;
+  var textures:Map<String, ImageElement>;
+  var textureId:Map<String, Int>;
+  var textureIndex:Array<String>; // TODO: Need an ordered map or something
 
   // TODO: Temp
   var defaultPositionAttributeLocation:Int;
@@ -70,7 +73,7 @@ class WebGLRenderContext implements RenderContext {
     // context.blendFunc(RenderingContext.ONE, RenderingContext.ONE_MINUS_SRC_ALPHA);
     // context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
 
-    // TODO: Text solitions
+    // TODO: Text solutions
     if (js.Browser.document.getElementById('feint-webgl-text') != null) {
       js.Browser.document.getElementById('feint-webgl-text').innerHTML = '';
     }
@@ -81,8 +84,9 @@ class WebGLRenderContext implements RenderContext {
       textRenderContext.context.clearRect(0, 0, canvas.width, canvas.height);
     }
 
+    // TODO: Figure out how to better store these frame-by-frame so we're not
+    // rebuilding it each frame
     batchRender.rects = [];
-    prepFrame();
   }
 
   public function submit() {
@@ -93,26 +97,6 @@ class WebGLRenderContext implements RenderContext {
   public function resize(width:Int, height:Int) {
     throw new FeintException('NotImplemented', "RenderContext.resize() not implemented for WebGL");
     // TODO: https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
-  }
-
-  function prepFrame() {
-    context.useProgram(defaultProgram);
-    // context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
-    // context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
-    // context.vertexAttribPointer(
-    //   defaultTextureCoordinateAttributionLocation,
-    //   size,
-    //   type,
-    //   normalize,
-    //   stride,
-    //   offset
-    // );
-    context.uniform2f(
-      defaultResolutionUniformLocation,
-      context.canvas.width,
-      context.canvas.height
-    );
-    context.uniform1i(useTexture, 1);
   }
 
   public function drawRect(
@@ -135,93 +119,137 @@ class WebGLRenderContext implements RenderContext {
     ?textureWidth:Int,
     ?textureHeight:Int
   ) {
-    // TODO: Remove prepFrame call when drawImage has it's own shader program
-    prepFrame();
+    var textureInitialized = textures.exists(assetId);
+    var textureLoaded = textureInitialized && textures.get(assetId) != null;
+    if (!textureInitialized) {
+      var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
+      var image = new Image();
+      if (imageElem.src.indexOf('file://') == 0) {
+        throw new FeintException(
+          'INVALID_FILESYSTEM_ACCESS',
+          'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
+        );
+      }
+      requestCORSIfNotSameOrigin(image, imageElem.src);
+      image.src = imageElem.src;
 
-    if (textureBound[assetId] == null) {
-      if (textureLoading[assetId] == null) {
-        var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
-        var image = new Image();
-        if (imageElem.src.indexOf('file://') == 0) {
-          throw new FeintException(
-            'INVALID_FILESYSTEM_ACCESS',
-            'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
-          );
-        }
-        requestCORSIfNotSameOrigin(image, imageElem.src);
-        image.src = imageElem.src;
-        image.addEventListener('load', () -> {
-          textureLoading[assetId] = true;
-          textureBound[assetId] = image;
-        });
-      }
-    } else {
-      context.bindTexture(RenderingContext.TEXTURE_2D, defaultTexture);
-      context.texImage2D(
-        RenderingContext.TEXTURE_2D,
-        0,
-        RenderingContext.RGBA,
-        RenderingContext.RGBA,
-        RenderingContext.UNSIGNED_BYTE,
-        textureBound[assetId]
-      );
-      // context.generateMipmap(RenderingContext.TEXTURE_2D);
-      if (
-        textureWidth != null &&
-        textureHeight != null &&
-        isPowerOf2(textureWidth) &&
-        isPowerOf2(textureHeight) &&
-        scale == 1
-      ) {
-        // Yes, it's a power of 2. Generate mips.
-        context.generateMipmap(RenderingContext.TEXTURE_2D);
-      } else if (clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height) && scale == 1) {
-        context.generateMipmap(RenderingContext.TEXTURE_2D);
-      } else {
-        // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
-        context.texParameteri(
-          RenderingContext.TEXTURE_2D,
-          RenderingContext.TEXTURE_WRAP_S,
-          RenderingContext.CLAMP_TO_EDGE
-        );
-        context.texParameteri(
-          RenderingContext.TEXTURE_2D,
-          RenderingContext.TEXTURE_WRAP_T,
-          RenderingContext.CLAMP_TO_EDGE
-        );
-        context.texParameteri(
-          RenderingContext.TEXTURE_2D,
-          RenderingContext.TEXTURE_MIN_FILTER,
-          RenderingContext.NEAREST // LINEAR for non-pixel art
-        );
-        context.texParameterf(
-          RenderingContext.TEXTURE_2D,
-          RenderingContext.TEXTURE_MAG_FILTER,
-          RenderingContext.NEAREST
-        );
-      }
+      // Set texture to null and add to list
+      textures[assetId] = null;
+      textureIndex.push(assetId);
+      // var index = batchRender.prepTexture(context);
+      textureId[assetId] = 0;
+      image.addEventListener('load', () -> {
+        // Set texture to image after it loads
+        textures[assetId] = image;
+        textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
+      });
+    } else if (textureLoaded) {
+      // TODO: Bind texture
     }
 
-    var color = cast [0.5, 0.5, 0.5, 1];
-    context.uniform4f(defaultColorUniformLocation, color[0], color[1], color[2], color[3]);
-    context.uniform1i(useTexture, 1);
-
-    context.enableVertexAttribArray(defaultPositionAttributeLocation);
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
-    var size = 2; // 2 components per iteration
-    var type = RenderingContext.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    context.vertexAttribPointer(
-      defaultPositionAttributeLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
+    batchRender.addRect(
+      x,
+      y,
+      clip.width * scale,
+      clip.height * scale,
+      0xFFFFFFFF,
+      textureId[assetId]
     );
-    setRectangle(context, x, y, clip.width * scale, clip.height * scale);
+  }
+
+  public function oldDrawImage(
+    x:Int,
+    y:Int,
+    assetId:String,
+    ?clip:TextureClip,
+    ?scale:Float = 1,
+    ?textureWidth:Int,
+    ?textureHeight:Int
+  ) {
+    // if (textureBound[assetId] == null) {
+    //   if (textureLoading[assetId] == null) {
+    //     var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
+    //     var image = new Image();
+    //     if (imageElem.src.indexOf('file://') == 0) {
+    //       throw new FeintException(
+    //         'INVALID_FILESYSTEM_ACCESS',
+    //         'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
+    //       );
+    //     }
+    //     requestCORSIfNotSameOrigin(image, imageElem.src);
+    //     image.src = imageElem.src;
+    //     image.addEventListener('load', () -> {
+    //       textureLoading[assetId] = true;
+    //       textureBound[assetId] = image;
+    //     });
+    //   }
+    // } else {
+    //   context.bindTexture(RenderingContext.TEXTURE_2D, defaultTexture);
+    //   context.texImage2D(
+    //     RenderingContext.TEXTURE_2D,
+    //     0,
+    //     RenderingContext.RGBA,
+    //     RenderingContext.RGBA,
+    //     RenderingContext.UNSIGNED_BYTE,
+    //     textureBound[assetId]
+    //   );
+    //   // context.generateMipmap(RenderingContext.TEXTURE_2D);
+    //   if (
+    //     textureWidth != null &&
+    //     textureHeight != null &&
+    //     isPowerOf2(textureWidth) &&
+    //     isPowerOf2(textureHeight) &&
+    //     scale == 1
+    //   ) {
+    //     // Yes, it's a power of 2. Generate mips.
+    //     context.generateMipmap(RenderingContext.TEXTURE_2D);
+    //   } else if (clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height) && scale == 1) {
+    //     context.generateMipmap(RenderingContext.TEXTURE_2D);
+    //   } else {
+    //     // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
+    //     context.texParameteri(
+    //       RenderingContext.TEXTURE_2D,
+    //       RenderingContext.TEXTURE_WRAP_S,
+    //       RenderingContext.CLAMP_TO_EDGE
+    //     );
+    //     context.texParameteri(
+    //       RenderingContext.TEXTURE_2D,
+    //       RenderingContext.TEXTURE_WRAP_T,
+    //       RenderingContext.CLAMP_TO_EDGE
+    //     );
+    //     context.texParameteri(
+    //       RenderingContext.TEXTURE_2D,
+    //       RenderingContext.TEXTURE_MIN_FILTER,
+    //       RenderingContext.NEAREST // LINEAR for non-pixel art
+    //     );
+    //     context.texParameterf(
+    //       RenderingContext.TEXTURE_2D,
+    //       RenderingContext.TEXTURE_MAG_FILTER,
+    //       RenderingContext.NEAREST
+    //     );
+    //   }
+    // }
+
+    // var color = cast [0.5, 0.5, 0.5, 1];
+    // context.uniform4f(defaultColorUniformLocation, color[0], color[1], color[2], color[3]);
+    // context.uniform1i(useTexture, 1);
+
+    // context.enableVertexAttribArray(defaultPositionAttributeLocation);
+    // context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
+    // var size = 2; // 2 components per iteration
+    // var type = RenderingContext.FLOAT; // the data is 32bit floats
+    // var normalize = false; // don't normalize the data
+    // var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+    // var offset = 0; // start at the beginning of the buffer
+    // context.vertexAttribPointer(
+    //   defaultPositionAttributeLocation,
+    //   size,
+    //   type,
+    //   normalize,
+    //   stride,
+    //   offset
+    // );
+    // setRectangle(context, x, y, clip.width * scale, clip.height * scale);
 
     context.enableVertexAttribArray(defaultTextureCoordinateAttributionLocation);
     context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
@@ -393,6 +421,9 @@ class WebGLRenderContext implements RenderContext {
     batchRender = new BatchRenderWebGLShader();
     batchRender.load();
     batchRender.compile(context);
+    textures = [];
+    textureId = [];
+    textureIndex = [];
 
     // Allows alpha blending for transparency in textures
     context.enable(RenderingContext.BLEND);

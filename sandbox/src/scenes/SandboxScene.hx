@@ -28,7 +28,7 @@ class SandboxScene extends Scene {
     super.init();
 
     rects = [
-      for (i in 0...10000)
+      for (i in 0...2500)
         {
           x: Math.floor(Math.random() * game.window.width),
           y: Math.floor(Math.random() * game.window.height),
@@ -86,28 +86,40 @@ class SandboxScene extends Scene {
 
   override function render(renderer:Renderer) {
     super.render(renderer);
-
-    // renderer.drawImage(0, 0, Assets.icon__png, {
-    //   x: 128,
-    //   y: 128,
-    //   width: 256,
-    //   height: 256
-    // }, 1, 512, 512);
+    renderer.drawRect(50, 50, 100, 100, {color: 0xFF00FFFF});
+    renderer.drawRect(200, 200, 100, 100, {color: 0xFFFF0000});
     for (rect in rects) {
       renderer.drawRect(rect.x, rect.y, rect.width, rect.height, {color: rect.color});
+
+      renderer.drawImage(rect.x + 100, rect.y + 100, Assets.icon__png, {
+        x: 0,
+        y: 0,
+        width: 512,
+        height: 512
+      }, 0.25, 512, 512);
+
+      renderer.drawImage(rect.x + 100, rect.y + 100, Assets.inwave_labs_discord__png, {
+        x: 0,
+        y: 0,
+        width: 512,
+        height: 512
+      }, 0.25, 512, 512);
     }
-    // renderer.drawImage(100, 100, Assets.inwave_labs_discord__png, {
-    //   x: 0,
-    //   y: 0,
-    //   width: 100,
-    //   height: 100
-    // });
-    // renderer.drawImage(300, 200, Assets.icon__png, {
-    //   x: 0,
-    //   y: 0,
-    //   width: 100,
-    //   height: 100
-    // });
+
+    renderer.drawImage(150, 200, Assets.icon__png, {
+      x: 0,
+      y: 0,
+      width: 512,
+      height: 512
+    }, 0.25, 512, 512);
+    renderer.drawImage(350, 200, Assets.inwave_labs_discord__png, {
+      x: 0,
+      y: 0,
+      width: 512,
+      height: 512
+    }, 0.25, 512, 512);
+    renderer.drawRect(0, 0, 500, 20, {color: 0xFFFF0000});
+
     // renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
 
     forge.render(renderer);
