@@ -182,6 +182,44 @@ class BatchRenderWebGLShader extends WebGLShader {
     context.drawArrays(primitiveType, offset, count);
   }
 
+  public function addClipRect(
+    x:Float,
+    y:Float,
+    width:Float,
+    height:Float,
+    clipX1:Float,
+    clipX2:Float,
+    clipY1:Float,
+    clipY2:Float,
+    color:Int,
+    textureId:Int = 0
+  ) {
+    var x1 = x;
+    var x2 = x + width;
+    var y1 = y;
+    var y2 = y + height;
+    rects.push({
+      positions: [
+        x1, y1,
+        x2, y1,
+        x1, y2,
+        x1, y2,
+        x2, y1,
+        x2, y2
+      ],
+      color: cast Math.colorToVec4(color),
+      textureIndex: textureId,
+      textureCoordinates: [
+        clipX1, clipY1,
+        clipX2, clipY1,
+        clipX1, clipY2,
+        clipX1, clipY2,
+        clipX2, clipY1,
+        clipX2, clipY2,
+      ]
+    });
+  }
+
   public function addRect(
     x:Float,
     y:Float,

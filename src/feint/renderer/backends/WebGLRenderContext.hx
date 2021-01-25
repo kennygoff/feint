@@ -128,14 +128,29 @@ class WebGLRenderContext implements RenderContext {
       // TODO: Bind texture
     }
 
-    batchRender.addRect(
-      x,
-      y,
-      clip.width * scale,
-      clip.height * scale,
-      0xFFFFFFFF,
-      textureId[assetId]
-    );
+    if (clip != null && textureWidth != null && textureHeight != null) {
+      batchRender.addClipRect(
+        x,
+        y,
+        clip.width * scale,
+        clip.height * scale,
+        clip.x / textureWidth,
+        (clip.x + clip.width) / textureWidth,
+        clip.y / textureHeight,
+        (clip.y + clip.height) / textureHeight,
+        0xFFFFFFFF,
+        textureId[assetId]
+      );
+    } else {
+      batchRender.addRect(
+        x,
+        y,
+        clip.width * scale,
+        clip.height * scale,
+        0xFFFFFFFF,
+        textureId[assetId]
+      );
+    }
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {

@@ -69,11 +69,11 @@ class SandboxScene extends Scene {
     sprite.animation.play('run', 30, true);
 
     forge = new Forge();
-    // forge.addEntity(Entity.create(), [
-    //   new PositionComponent(0, 0),
-    //   new HitboxComponent(0, 0, 96, 96),
-    //   new SpriteComponent(sprite)
-    // ]);
+    forge.addEntity(Entity.create(), [
+      new PositionComponent(0, 0),
+      new HitboxComponent(0, 0, 96, 96),
+      new SpriteComponent(sprite)
+    ]);
     forge.addSystem(new SpriteAnimationSystem());
     forge.addRenderSystem(new SpriteRenderSystem());
   }
@@ -106,19 +106,12 @@ class SandboxScene extends Scene {
       }, 0.25, 512, 512);
     }
 
-    renderer.drawImage(150, 200, Assets.icon__png, {
-      x: 0,
-      y: 0,
-      width: 512,
-      height: 512
-    }, 0.25, 512, 512);
-    renderer.drawImage(350, 200, Assets.inwave_labs_discord__png, {
-      x: 0,
-      y: 0,
-      width: 512,
-      height: 512
-    }, 0.25, 512, 512);
-    renderer.drawRect(0, 0, 500, 20, {color: 0xFFFF0000});
+    renderer.drawImage(0, 0, Assets.icon__png, {
+      x: 128,
+      y: 128,
+      width: 128,
+      height: 128
+    }, 1, 512, 512);
 
     // renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
 
