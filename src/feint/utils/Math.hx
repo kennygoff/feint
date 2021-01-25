@@ -1,5 +1,6 @@
 package feint.utils;
 
+import js.lib.Float32Array;
 import haxe.ds.Either;
 
 class Math {
@@ -34,6 +35,30 @@ class Math {
           return cast f;
         }
     }
+  }
+
+  #if js
+  public static function colorToVec4(color:Int):Float32Array {
+    final alpha:Float = ((color >> 24) & 0xFF) / 255;
+    final red:Float = ((color >> 16) & 0xFF) / 255;
+    final green:Float = ((color >> 8) & 0xFF) / 255;
+    final blue:Float = (color & 0xFF) / 255;
+
+    return cast [red, green, blue, alpha];
+  }
+  #else
+  public static function colorToVec4(color:Int):Array<Float> {
+    final alpha:Float = ((color >> 24) & 0xFF) / 255;
+    final red:Float = ((color >> 16) & 0xFF) / 255;
+    final green:Float = ((color >> 8) & 0xFF) / 255;
+    final blue:Float = (color & 0xFF) / 255;
+
+    return cast [red, green, blue, alpha];
+  }
+  #end
+
+  public static function isPowerOf2(value:Int) {
+    return (value & (value - 1)) == 0;
   }
 }
 

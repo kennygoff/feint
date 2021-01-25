@@ -4,8 +4,6 @@ import feint.renderer.backends.BatchRenderWebGLShader;
 import js.html.URL;
 import js.html.ImageElement;
 import js.html.Image;
-import js.lib.Uint8Array;
-import js.html.webgl.Texture;
 import feint.debug.FeintException;
 import js.lib.Float32Array;
 import feint.debug.Logger;
@@ -13,8 +11,6 @@ import feint.renderer.Renderer.TextureClip;
 import feint.renderer.Renderer.TextAlign;
 import feint.renderer.Renderer.RendererPrimitiveOptions;
 import js.html.webgl.RenderingContext;
-import js.html.webgl.UniformLocation;
-import js.html.webgl.Buffer;
 import js.html.webgl.Program;
 import js.html.webgl.Shader;
 import js.html.CanvasElement;
@@ -40,17 +36,6 @@ class WebGLRenderContext implements RenderContext {
   var textureIndex:Array<String>; // TODO: Need an ordered map or something
 
   // TODO: Temp
-  var defaultPositionAttributeLocation:Int;
-  var defaultTextureCoordinateAttributionLocation:Int;
-  var useTexture:UniformLocation;
-  var defaultTexture:Texture;
-  var defaultProgram:Program;
-  var defaultTextureCoordinateBuffer:Buffer;
-  var defaultPositionBuffer:Buffer;
-  var defaultResolutionUniformLocation:UniformLocation;
-  var defaultColorUniformLocation:UniformLocation;
-  var textureBound:Map<String, ImageElement> = [];
-  var textureLoading:Map<String, Bool> = [];
   var textCanvas:CanvasElement;
   var textRenderContext:CanvasRenderContext;
 
@@ -157,134 +142,6 @@ class WebGLRenderContext implements RenderContext {
     );
   }
 
-  public function oldDrawImage(
-    x:Int,
-    y:Int,
-    assetId:String,
-    ?clip:TextureClip,
-    ?scale:Float = 1,
-    ?textureWidth:Int,
-    ?textureHeight:Int
-  ) {
-    // if (textureBound[assetId] == null) {
-    //   if (textureLoading[assetId] == null) {
-    //     var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
-    //     var image = new Image();
-    //     if (imageElem.src.indexOf('file://') == 0) {
-    //       throw new FeintException(
-    //         'INVALID_FILESYSTEM_ACCESS',
-    //         'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
-    //       );
-    //     }
-    //     requestCORSIfNotSameOrigin(image, imageElem.src);
-    //     image.src = imageElem.src;
-    //     image.addEventListener('load', () -> {
-    //       textureLoading[assetId] = true;
-    //       textureBound[assetId] = image;
-    //     });
-    //   }
-    // } else {
-    //   context.bindTexture(RenderingContext.TEXTURE_2D, defaultTexture);
-    //   context.texImage2D(
-    //     RenderingContext.TEXTURE_2D,
-    //     0,
-    //     RenderingContext.RGBA,
-    //     RenderingContext.RGBA,
-    //     RenderingContext.UNSIGNED_BYTE,
-    //     textureBound[assetId]
-    //   );
-    //   // context.generateMipmap(RenderingContext.TEXTURE_2D);
-    //   if (
-    //     textureWidth != null &&
-    //     textureHeight != null &&
-    //     isPowerOf2(textureWidth) &&
-    //     isPowerOf2(textureHeight) &&
-    //     scale == 1
-    //   ) {
-    //     // Yes, it's a power of 2. Generate mips.
-    //     context.generateMipmap(RenderingContext.TEXTURE_2D);
-    //   } else if (clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height) && scale == 1) {
-    //     context.generateMipmap(RenderingContext.TEXTURE_2D);
-    //   } else {
-    //     // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
-    //     context.texParameteri(
-    //       RenderingContext.TEXTURE_2D,
-    //       RenderingContext.TEXTURE_WRAP_S,
-    //       RenderingContext.CLAMP_TO_EDGE
-    //     );
-    //     context.texParameteri(
-    //       RenderingContext.TEXTURE_2D,
-    //       RenderingContext.TEXTURE_WRAP_T,
-    //       RenderingContext.CLAMP_TO_EDGE
-    //     );
-    //     context.texParameteri(
-    //       RenderingContext.TEXTURE_2D,
-    //       RenderingContext.TEXTURE_MIN_FILTER,
-    //       RenderingContext.NEAREST // LINEAR for non-pixel art
-    //     );
-    //     context.texParameterf(
-    //       RenderingContext.TEXTURE_2D,
-    //       RenderingContext.TEXTURE_MAG_FILTER,
-    //       RenderingContext.NEAREST
-    //     );
-    //   }
-    // }
-
-    // var color = cast [0.5, 0.5, 0.5, 1];
-    // context.uniform4f(defaultColorUniformLocation, color[0], color[1], color[2], color[3]);
-    // context.uniform1i(useTexture, 1);
-
-    // context.enableVertexAttribArray(defaultPositionAttributeLocation);
-    // context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
-    // var size = 2; // 2 components per iteration
-    // var type = RenderingContext.FLOAT; // the data is 32bit floats
-    // var normalize = false; // don't normalize the data
-    // var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    // var offset = 0; // start at the beginning of the buffer
-    // context.vertexAttribPointer(
-    //   defaultPositionAttributeLocation,
-    //   size,
-    //   type,
-    //   normalize,
-    //   stride,
-    //   offset
-    // );
-    // setRectangle(context, x, y, clip.width * scale, clip.height * scale);
-
-    context.enableVertexAttribArray(defaultTextureCoordinateAttributionLocation);
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
-    var size = 2; // 2 components per iteration
-    var type = RenderingContext.FLOAT; // the data is 32bit floats
-    var normalize = false; // don't normalize the data
-    var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
-    var offset = 0; // start at the beginning of the buffer
-    context.vertexAttribPointer(
-      defaultTextureCoordinateAttributionLocation,
-      size,
-      type,
-      normalize,
-      stride,
-      offset
-    );
-    if (textureWidth != null && textureHeight != null) {
-      // trace(clip);
-      setRectangle(
-        context,
-        clip.x / textureWidth,
-        clip.y / textureHeight,
-        clip.width / textureWidth,
-        clip.height / textureHeight
-      );
-    } else {
-      setRectangle(context, 0, 0, 1, 1);
-    }
-
-    var primitiveType = RenderingContext.TRIANGLES;
-    var offset = 0;
-    var count = 6;
-    context.drawArrays(primitiveType, offset, count);
-  }
-
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
     // HTML Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-html.html
     // Canvas Overlay: https://webglfundamentals.org/webgl/lessons/webgl-text-canvas2d.html
@@ -318,105 +175,6 @@ class WebGLRenderContext implements RenderContext {
     // image-rendering: -webkit-crisp-edges;
     // image-rendering: pixelated;
     // image-rendering: crisp-edges;
-
-    var vertexShaderSource = '
-      attribute vec2 a_position;
-      attribute vec2 a_texcoord;
-
-      uniform vec2 u_resolution;
-
-      varying vec2 v_texcoord;
-      
-      void main() {
-        // convert the position from pixels to 0.0 to 1.0
-        vec2 zeroToOne = a_position / u_resolution;
-     
-        // convert from 0->1 to 0->2
-        vec2 zeroToTwo = zeroToOne * 2.0;
-     
-        // convert from 0->2 to -1->+1 (clip space)
-        vec2 clipSpace = zeroToTwo - 1.0;
-     
-        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-
-
-        //////
-
-        // convert the position from pixels to 0.0 to 1.0
-        vec2 zeroToOne2 = a_position / u_resolution;
-     
-        // convert from 0->1 to 0->2
-        vec2 zeroToTwo2 = zeroToOne2 * 2.0;
-     
-        // convert from 0->2 to -1->+1 (clip space)
-        vec2 clipSpace2 = zeroToTwo2 - 1.0;
-
-        // Pass the texcoord to the fragment shader.     
-        v_texcoord = a_texcoord;
-      }
-    ';
-
-    var fragmentShaderSource = '
-      precision mediump float;
-
-      varying vec2 v_texcoord;
- 
-      uniform sampler2D u_texture;
-      uniform vec4 u_color;
-      uniform int u_useTexture;
-
-      void main() {
-        if(u_useTexture == 1) {
-          vec4 texColor = texture2D(u_texture, v_texcoord);
-          gl_FragColor = vec4(texColor.rgb, texColor.a);
-        } else {
-          gl_FragColor = u_color;
-        }
-      }
-    ';
-
-    var vertexShader = compileShader(context, Vertex, vertexShaderSource);
-    var fragmentShader = compileShader(context, Fragment, fragmentShaderSource);
-    defaultProgram = createProgram(context, vertexShader, fragmentShader);
-    defaultPositionAttributeLocation = context.getAttribLocation(defaultProgram, "a_position");
-    defaultTextureCoordinateAttributionLocation = context.getAttribLocation(
-      defaultProgram,
-      "a_texcoord"
-    );
-    defaultResolutionUniformLocation = context.getUniformLocation(defaultProgram, "u_resolution");
-    useTexture = context.getUniformLocation(defaultProgram, "u_useTexture");
-    defaultColorUniformLocation = context.getUniformLocation(defaultProgram, "u_color");
-    defaultPositionBuffer = context.createBuffer();
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultPositionBuffer);
-    // NOT NEEDED SINCE WE BIND PER RECT
-    // var positions = [
-    //   0, 0,
-    //   0, 0,
-    //   0, 0,
-    //   0, 0,
-    //   0, 0,
-    //   0, 0,
-    // ];
-    // context.bufferData(
-    //   RenderingContext.ARRAY_BUFFER,
-    //   new js.lib.Float32Array(positions),
-    //   RenderingContext.STATIC_DRAW
-    // );
-    defaultTextureCoordinateBuffer = context.createBuffer();
-    context.bindBuffer(RenderingContext.ARRAY_BUFFER, defaultTextureCoordinateBuffer);
-    defaultTexture = context.createTexture();
-    context.bindTexture(RenderingContext.TEXTURE_2D, defaultTexture);
-    context.texImage2D(
-      RenderingContext.TEXTURE_2D,
-      0,
-      RenderingContext.RGBA,
-      1,
-      1,
-      0,
-      RenderingContext.RGBA,
-      RenderingContext.UNSIGNED_BYTE,
-      new Uint8Array([0, 255, 255, 255])
-    );
 
     batchRender = new BatchRenderWebGLShader();
     batchRender.load();
@@ -456,89 +214,6 @@ class WebGLRenderContext implements RenderContext {
     //   webglText.id = 'feint-webgl-text-div';
     //   js.Browser.document.body.appendChild(webglText);
     // }
-  }
-
-  /**
-   * Create and compile a WebGL shader
-   * @param context WebGL Context
-   * @param type Type of shader, either Vertex or Fragment
-   * @param source Shader source code as a string
-   * @return Shader
-   */
-  function compileShader(context:RenderingContext, type:WebGLShaderType, source:String):Shader {
-    var shader = context.createShader(type);
-    context.shaderSource(shader, source);
-    context.compileShader(shader);
-
-    var success:Bool = cast context.getShaderParameter(shader, RenderingContext.COMPILE_STATUS);
-    if (!success) {
-      Logger.error('WebGL shader compilation ' + context.getShaderInfoLog(shader));
-      context.deleteShader(shader);
-      return null;
-    }
-
-    return shader;
-  }
-
-  /**
-   * Create a WebGL program with a vertex and fragment shader
-   * @param context WebGL Context
-   * @param vertexShader A compiled WebGL vertex shader
-   * @param fragmentShader A compiled WebGL vertex shader
-   * @return Program
-   */
-  function createProgram(
-    context:RenderingContext,
-    vertexShader:Shader,
-    fragmentShader:Shader
-  ):Program {
-    var program = context.createProgram();
-    context.attachShader(program, vertexShader);
-    context.attachShader(program, fragmentShader);
-    context.linkProgram(program);
-
-    var success:Bool = cast context.getProgramParameter(program, RenderingContext.LINK_STATUS);
-    if (!success) {
-      Logger.error('WebGL program creation ' + context.getProgramInfoLog(program));
-      context.deleteProgram(program);
-      return null;
-    }
-
-    return program;
-  }
-
-  function setRectangle(
-    webglContext:RenderingContext,
-    x:Float,
-    y:Float,
-    width:Float,
-    height:Float
-  ) {
-    var x1 = x;
-    var x2 = x + width;
-    var y1 = y;
-    var y2 = y + height;
-    context.bufferData(RenderingContext.ARRAY_BUFFER, new js.lib.Float32Array([
-      x1, y1,
-      x2, y1,
-      x1, y2,
-      x1, y2,
-      x2, y1,
-      x2, y2
-    ]), RenderingContext.STATIC_DRAW);
-  }
-
-  static inline function colorToVec4(color:Int):Float32Array {
-    final alpha = ((color >> 24) & 0xFF) / 255;
-    final red = (color >> 16) & 0xFF;
-    final green = (color >> 8) & 0xFF;
-    final blue = color & 0xFF;
-
-    return cast [red, green, blue, alpha];
-  }
-
-  static inline function isPowerOf2(value:Int) {
-    return (value & (value - 1)) == 0;
   }
 
   /**

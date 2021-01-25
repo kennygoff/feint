@@ -1,5 +1,6 @@
 package feint.renderer.backends;
 
+import feint.utils.Math;
 import feint.debug.FeintException;
 import js.lib.Uint8Array;
 import js.html.ImageElement;
@@ -203,7 +204,7 @@ class BatchRenderWebGLShader extends WebGLShader {
         x2, y1,
         x2, y2
       ],
-      color: cast colorToVec4(color),
+      color: cast Math.colorToVec4(color),
       textureIndex: textureId,
       textureCoordinates: [
         0, 0,
@@ -310,8 +311,8 @@ class BatchRenderWebGLShader extends WebGLShader {
     var useMipMap =
       image.width != null &&
       image.height != null &&
-      isPowerOf2(image.width) &&
-      isPowerOf2(image.height);
+      Math.isPowerOf2(image.width) &&
+      Math.isPowerOf2(image.height);
     // var useMipMap = scale == 1;
     // var useMipMap = clip != null && isPowerOf2(clip.width) && isPowerOf2(clip.height);
     if (useMipMap) {
@@ -423,7 +424,7 @@ class BatchRenderWebGLShader extends WebGLShader {
     var x2 = rect.x + rect.width;
     var y1 = rect.y;
     var y2 = rect.y + rect.height;
-    var color = colorToVec4(rect.color);
+    var color = Math.colorToVec4(rect.color);
     return [
       x1, y1, color[0], color[1], color[2], color[3],
       x2, y1, color[0], color[1], color[2], color[3],
@@ -432,18 +433,5 @@ class BatchRenderWebGLShader extends WebGLShader {
       x2, y1, color[0], color[1], color[2], color[3],
       x2, y2, color[0], color[1], color[2], color[3],
     ];
-  }
-
-  static inline function colorToVec4(color:Int):Float32Array {
-    final alpha:Float = ((color >> 24) & 0xFF) / 255;
-    final red:Float = ((color >> 16) & 0xFF) / 255;
-    final green:Float = ((color >> 8) & 0xFF) / 255;
-    final blue:Float = (color & 0xFF) / 255;
-
-    return cast [red, green, blue, alpha];
-  }
-
-  static inline function isPowerOf2(value:Int) {
-    return (value & (value - 1)) == 0;
   }
 }
