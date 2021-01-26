@@ -14,7 +14,6 @@ class Sandbox extends Application {
         width: 640,
         height: 360
       },
-      api: WebGL
     });
   }
 }

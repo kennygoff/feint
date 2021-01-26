@@ -13,7 +13,7 @@
       "name": "[Feint] Sandbox Chrome Debugger",
       "type": "chrome",
       "request": "launch",
-      "port": 9222,
+      // "port": 9222,
       "url": "http://localhost:1234",
       "webRoot": "${workspaceFolder}/sandbox/build/web",
       "preLaunchTask": "[Feint] Sandbox Server",
