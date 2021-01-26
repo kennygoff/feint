@@ -11,7 +11,7 @@ class WebRenderPlatform {
   public static function createContext(
     width:Int,
     height:Int,
-    api:RenderAPI = Canvas
+    api:RenderAPI = WebGL
   ):RenderContext {
     // Create canvas, which will be used regarless of Render API
     var canvas = createCanvasElement(width, height);

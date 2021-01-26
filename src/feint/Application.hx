@@ -32,7 +32,7 @@ typedef ApplicationSettings = {
   /**
    * Specify a particular Render API to use.
    *
-   * JS target defaults to `RenderAPI.Canvas`.
+   * JS target defaults to `RenderAPI.WebGL`.
    */
   var ?api:RenderAPI;
 }

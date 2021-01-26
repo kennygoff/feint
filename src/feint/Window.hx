@@ -60,7 +60,7 @@ class Window {
    * @param width Width of the window's render context
    * @param height Height of the window's render context
    */
-  public function new(title:String, width:Int, height:Int, api:RenderAPI = Canvas) {
+  public function new(title:String, width:Int, height:Int, api:RenderAPI = WebGL) {
     this.title = title;
     this.width = width;
     this.height = height;
