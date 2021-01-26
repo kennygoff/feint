@@ -32,6 +32,8 @@ typedef RectProperties = {
   var color:Array<Float>; // Vec4(ARGB): Flat color repeated for each position
   var textureIndex:Float; // Float: Index of texture, 0 is identity
   var textureCoordinates:Array<Float>; // Vec2(XY)[x6]: Coordinate of texture clip the vertex corresponds to
+  var rotation:Array<Float>; // Vec2(XY): Rotation
+  var alpha:Float; // Float: Alpha
 }
 
 class BatchRenderWebGLShader extends WebGLShader {
@@ -42,6 +44,8 @@ class BatchRenderWebGLShader extends WebGLShader {
   var position:AttributeLocation;
   var textureIndex:AttributeLocation;
   var textureCoordinate:AttributeLocation;
+  var rotation:AttributeLocation;
+  var alpha:AttributeLocation;
   var resolution:UniformLocation;
   var textures:UniformLocation;
   var projection:UniformLocation;
@@ -61,6 +65,8 @@ class BatchRenderWebGLShader extends WebGLShader {
       attribute vec4 a_color;
       attribute float a_textureIndex;
       attribute vec2 a_textureCoordinate;
+      attribute vec2 a_rotation;
+      attribute float a_alpha;
 
       uniform vec2 u_resolution;
       uniform mat3 u_projection;
@@ -68,10 +74,14 @@ class BatchRenderWebGLShader extends WebGLShader {
       varying vec4 v_color;
       varying float v_textureIndex;
       varying vec2 v_textureCoordinate;
+      varying float v_alpha;
       
       void main() {
-        // (a_transform * vec3(a_position, 1)).xy;
-        vec2 position = (u_projection * vec3(a_position, 1)).xy;
+        vec2 rotatedPosition = vec2(
+          a_position.x * a_rotation.y + a_position.y * a_rotation.x,
+          a_position.y * a_rotation.y - a_position.x * a_rotation.x);
+
+        vec2 position = (u_projection * vec3(rotatedPosition, 1)).xy;
 
         // convert the position from pixels to 0.0 to 1.0
         vec2 zeroToOne = position / u_resolution;
@@ -86,6 +96,7 @@ class BatchRenderWebGLShader extends WebGLShader {
         v_color = a_color;
         v_textureIndex = a_textureIndex;
         v_textureCoordinate = a_textureCoordinate;
+        v_alpha = a_alpha;
       }
     ';
 
@@ -101,6 +112,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       varying vec4 v_color;
       varying vec2 v_textureCoordinate;
       varying float v_textureIndex;
+      varying float v_alpha;
 
       vec4 getTextureColorAtIndex(sampler2D textures[maxTextures], int index) {
         vec4 color = vec4(1, 1, 1, 1);
@@ -114,7 +126,7 @@ class BatchRenderWebGLShader extends WebGLShader {
 
       void main() {
         vec4 texColor = getTextureColorAtIndex(u_textures, int(v_textureIndex));
-        gl_FragColor = v_color * texColor;
+        gl_FragColor = v_color * texColor * vec4(1, 1, 1, v_alpha);
       }
     ';
 
@@ -127,6 +139,8 @@ class BatchRenderWebGLShader extends WebGLShader {
     color = context.getAttribLocation(program, 'a_color');
     textureIndex = context.getAttribLocation(program, 'a_textureIndex');
     textureCoordinate = context.getAttribLocation(program, 'a_textureCoordinate');
+    rotation = context.getAttribLocation(program, 'a_rotation');
+    alpha = context.getAttribLocation(program, 'a_alpha');
     resolution = context.getUniformLocation(program, 'u_resolution');
     textures = context.getUniformLocation(program, 'u_textures');
     projection = context.getUniformLocation(program, 'u_projection');
@@ -159,19 +173,27 @@ class BatchRenderWebGLShader extends WebGLShader {
 
     // Vertex Positions
     context.enableVertexAttribArray(position);
-    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 36, 0);
+    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 48, 0);
 
     // Vertex Colors
     context.enableVertexAttribArray(color);
-    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 36, 8);
+    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 48, 8);
 
     // Vertex Texture Index
     context.enableVertexAttribArray(textureIndex);
-    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, 36, 24);
+    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, 48, 24);
 
     // Vertex Texture Coordinate
     context.enableVertexAttribArray(textureCoordinate);
-    context.vertexAttribPointer(textureCoordinate, 2, RenderingContext.FLOAT, false, 36, 28);
+    context.vertexAttribPointer(textureCoordinate, 2, RenderingContext.FLOAT, false, 48, 28);
+
+    // Vertex Texture Coordinate
+    context.enableVertexAttribArray(rotation);
+    context.vertexAttribPointer(rotation, 2, RenderingContext.FLOAT, false, 48, 36);
+
+    // Vertex Texture Coordinate
+    context.enableVertexAttribArray(alpha);
+    context.vertexAttribPointer(alpha, 1, RenderingContext.FLOAT, false, 48, 44);
 
     #if (debug && false)
     // Profiling for adding data to the buffer
@@ -237,7 +259,9 @@ class BatchRenderWebGLShader extends WebGLShader {
         clipX1, clipY2,
         clipX2, clipY1,
         clipX2, clipY2,
-      ]
+      ],
+      rotation: [0, 1],
+      alpha: 1
     });
   }
 
@@ -271,7 +295,9 @@ class BatchRenderWebGLShader extends WebGLShader {
         0, 1,
         1, 0,
         1, 1,
-      ]
+      ],
+      rotation: [0, 1],
+      alpha: 1
     });
   }
 
@@ -406,7 +432,7 @@ class BatchRenderWebGLShader extends WebGLShader {
 
   function rectsToBufferData(rects:Array<RectProperties>):Float32Array {
     var verticesPerRect = 6;
-    var floatsPerVertex = 9;
+    var floatsPerVertex = 12;
     var bufferSize = rects.length * verticesPerRect * floatsPerVertex;
     var bufferData = new js.lib.Float32Array(bufferSize);
     var bi = 0; // Buffer index
@@ -420,6 +446,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[0];
       bufferData[bi++] = rects[i].textureCoordinates[1];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
 
       bufferData[bi++] = rects[i].positions[2];
       bufferData[bi++] = rects[i].positions[3];
@@ -430,6 +459,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[2];
       bufferData[bi++] = rects[i].textureCoordinates[3];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
 
       bufferData[bi++] = rects[i].positions[4];
       bufferData[bi++] = rects[i].positions[5];
@@ -440,6 +472,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[4];
       bufferData[bi++] = rects[i].textureCoordinates[5];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
 
       bufferData[bi++] = rects[i].positions[6];
       bufferData[bi++] = rects[i].positions[7];
@@ -450,6 +485,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[6];
       bufferData[bi++] = rects[i].textureCoordinates[7];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
 
       bufferData[bi++] = rects[i].positions[8];
       bufferData[bi++] = rects[i].positions[9];
@@ -460,6 +498,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[8];
       bufferData[bi++] = rects[i].textureCoordinates[9];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
 
       bufferData[bi++] = rects[i].positions[10];
       bufferData[bi++] = rects[i].positions[11];
@@ -470,6 +511,9 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].textureIndex;
       bufferData[bi++] = rects[i].textureCoordinates[10];
       bufferData[bi++] = rects[i].textureCoordinates[11];
+      bufferData[bi++] = rects[i].rotation[0];
+      bufferData[bi++] = rects[i].rotation[1];
+      bufferData[bi++] = rects[i].alpha;
     }
     return bufferData;
   }
