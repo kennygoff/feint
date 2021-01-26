@@ -1,5 +1,8 @@
 package feint.renderer.backends;
 
+import js.html.webgl.extension.ANGLEInstancedArrays;
+import feint.utils.Matrix;
+
 using Lambda;
 
 import js.html.ImageElement;
@@ -41,7 +44,11 @@ class BatchRenderWebGLShader extends WebGLShader {
   var textureCoordinate:AttributeLocation;
   var resolution:UniformLocation;
   var textures:UniformLocation;
+  var projection:UniformLocation;
   var buffer:Buffer;
+
+  // TEMP
+  var temp_translation:Array<Float>;
 
   public function new() {
     this.rects = [];
@@ -56,14 +63,18 @@ class BatchRenderWebGLShader extends WebGLShader {
       attribute vec2 a_textureCoordinate;
 
       uniform vec2 u_resolution;
+      uniform mat3 u_projection;
 
       varying vec4 v_color;
       varying float v_textureIndex;
       varying vec2 v_textureCoordinate;
       
       void main() {
+        // (a_transform * vec3(a_position, 1)).xy;
+        vec2 position = (u_projection * vec3(a_position, 1)).xy;
+
         // convert the position from pixels to 0.0 to 1.0
-        vec2 zeroToOne = a_position / u_resolution;
+        vec2 zeroToOne = position / u_resolution;
     
         // convert from 0->1 to 0->2
         vec2 zeroToTwo = zeroToOne * 2.0;
@@ -118,6 +129,7 @@ class BatchRenderWebGLShader extends WebGLShader {
     textureCoordinate = context.getAttribLocation(program, 'a_textureCoordinate');
     resolution = context.getUniformLocation(program, 'u_resolution');
     textures = context.getUniformLocation(program, 'u_textures');
+    projection = context.getUniformLocation(program, 'u_projection');
 
     buffer = context.createBuffer();
 
@@ -129,28 +141,37 @@ class BatchRenderWebGLShader extends WebGLShader {
   override public function draw(context:RenderingContext) {
     // Global uniforms, won't change per instance
     // TODO: Move to use()
+
+    // TODO: Camera matrix
+    var translationMatrix = Matrix.translation(0, 0);
+    var rotationMatrix = Matrix.rotation(0);
+    var scaleMatrix = Matrix.scaling(1, 1);
+    temp_translation = Matrix.multiply(translationMatrix, rotationMatrix);
+    temp_translation = Matrix.multiply(temp_translation, scaleMatrix);
+
     context.useProgram(program);
     context.uniform2f(resolution, context.canvas.width, context.canvas.height);
     context.uniform1iv(textures, [0, 1, 2, 3, 4, 5, 6, 7]);
+    context.uniformMatrix3fv(projection, false, cast temp_translation);
 
     // Vertex Buffer Object
     context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
 
     // Vertex Positions
-    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 36, 0);
     context.enableVertexAttribArray(position);
+    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 36, 0);
 
     // Vertex Colors
-    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 36, 8);
     context.enableVertexAttribArray(color);
+    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 36, 8);
 
     // Vertex Texture Index
-    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, 36, 24);
     context.enableVertexAttribArray(textureIndex);
+    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, 36, 24);
 
-    // Vertex Texture Index
-    context.vertexAttribPointer(textureCoordinate, 2, RenderingContext.FLOAT, false, 36, 28);
+    // Vertex Texture Coordinate
     context.enableVertexAttribArray(textureCoordinate);
+    context.vertexAttribPointer(textureCoordinate, 2, RenderingContext.FLOAT, false, 36, 28);
 
     #if (debug && false)
     // Profiling for adding data to the buffer
