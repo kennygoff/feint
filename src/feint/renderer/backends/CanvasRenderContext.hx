@@ -45,7 +45,8 @@ class CanvasRenderContext implements RenderContext {
 
   public function clear(color:Int = 0xFF000000) {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    drawRect(0, 0, canvas.width, canvas.height, {color: color});
+    drawRect(0, 0, canvas.width, canvas.height, 0, {color: color});
+    context.rotate(0);
   }
 
   public function submit() {
@@ -64,6 +65,7 @@ class CanvasRenderContext implements RenderContext {
     y:Int,
     width:Int,
     height:Int,
+    rotation:Float = 0.0,
     ?options:RendererPrimitiveOptions
   ) {
     final fillColor = options != null ? options.color : null;
@@ -71,10 +73,13 @@ class CanvasRenderContext implements RenderContext {
     final strokeWidth = options != null && options.strokeWidth != null ? options.strokeWidth : 1;
 
     context.lineWidth = strokeWidth;
+    context.translate(x, y);
+    context.rotate(rotation);
     context.strokeStyle = colorToRGBA(strokeColor);
     context.fillStyle = colorToRGBA(fillColor);
-    context.fillRect(x, y, width, height);
-    context.strokeRect(x, y, width, height);
+    context.fillRect(0, 0, width, height);
+    context.strokeRect(0, 0, width, height);
+    context.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   public function drawImage(
@@ -118,6 +123,7 @@ class CanvasRenderContext implements RenderContext {
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
+    context.rotate(0);
     context.textAlign = align;
     context.fillStyle = colorToRGBA(0xFFFFFFFF);
     context.font = '${fontSize}px ${font}';

@@ -25,6 +25,7 @@ interface RenderContext {
     y:Int,
     width:Int,
     height:Int,
+    rotation:Float = 0.0,
     ?options:RendererPrimitiveOptions
   ):Void;
   public function drawImage(

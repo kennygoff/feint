@@ -85,10 +85,11 @@ class WebGLRenderContext implements RenderContext {
     y:Int,
     width:Int,
     height:Int,
+    rotation:Float = 0.0,
     ?options:RendererPrimitiveOptions
   ) {
     var color = options != null && options.color != null ? options.color : 0xFFFFFFFF;
-    batchRender.addRect(x, y, width, height, color);
+    batchRender.addRect(x, y, width, height, color, rotation);
   }
 
   public function drawImage(
@@ -148,6 +149,7 @@ class WebGLRenderContext implements RenderContext {
         clip.width * scale,
         clip.height * scale,
         0xFFFFFFFF,
+        0,
         textureId[assetId]
       );
     }

@@ -18,22 +18,25 @@ typedef Rect = {
   var width:Int;
   var height:Int;
   var color:Int;
+  var rotation:Float;
 }
 
 class SandboxScene extends Scene {
   var forge:Forge;
   var rects:Array<Rect>;
+  var rot:Float = 0;
 
   override function init() {
     super.init();
 
     rects = [
-      for (i in 0...2500)
+      for (i in 0...1500)
         {
           x: Math.floor(Math.random() * game.window.width),
           y: Math.floor(Math.random() * game.window.height),
           width: Math.floor(Math.random() * game.window.width / 4),
           height: Math.floor(Math.random() * game.window.height / 4),
+          rotation: 0,
           color: 0xFF000000 | (Math.floor(
             Math.random() * 0xFF
           ) << 16) | (Math.floor(Math.random() * 0xFF) << 8) | Math.floor(Math.random() * 0xFF)
@@ -45,6 +48,7 @@ class SandboxScene extends Scene {
       y: 100,
       width: 100,
       height: 100,
+      rotation: Math.PI * 0.25,
       color: 0xFF00FFFF
     });
     rects.push({
@@ -52,6 +56,7 @@ class SandboxScene extends Scene {
       y: 100,
       width: 100,
       height: 100,
+      rotation: Math.PI * -0.15,
       color: 0xFFFF00FF
     });
     rects.push({
@@ -59,6 +64,7 @@ class SandboxScene extends Scene {
       y: 100,
       width: 100,
       height: 100,
+      rotation: Math.PI * Math.random(),
       color: 0xFFFFFF00
     });
 
@@ -82,6 +88,11 @@ class SandboxScene extends Scene {
     super.update(elapsed);
 
     forge.update(elapsed);
+
+    rot += elapsed / 3000;
+    if (rot >= 2) {
+      rot = -2;
+    }
   }
 
   override function render(renderer:Renderer) {
@@ -89,7 +100,14 @@ class SandboxScene extends Scene {
     renderer.drawRect(50, 50, 100, 100, {color: 0xFF00FFFF});
     renderer.drawRect(200, 200, 100, 100, {color: 0xFFFF0000});
     for (rect in rects) {
-      renderer.drawRect(rect.x, rect.y, rect.width, rect.height, {color: rect.color});
+      renderer.drawRect(
+        rect.x,
+        rect.y,
+        rect.width,
+        rect.height,
+        rect.rotation,
+        {color: rect.color}
+      );
 
       renderer.drawImage(rect.x + 100, rect.y + 100, Assets.icon__png, {
         x: 0,
@@ -105,6 +123,8 @@ class SandboxScene extends Scene {
         height: 512
       }, 0.25, 512, 512);
     }
+
+    renderer.drawRect(150, 150, 40, 40, Math.PI * rot, {color: 0x550000FF});
 
     renderer.drawImage(0, 0, Assets.icon__png, {
       x: 128,

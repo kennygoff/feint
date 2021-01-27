@@ -35,9 +35,10 @@ class Renderer {
     y:Int,
     width:Int,
     height:Int,
+    rotation:Float = 0.0,
     ?options:RendererPrimitiveOptions
   ) {
-    renderContext.drawRect(x, y, width, height, options);
+    renderContext.drawRect(x, y, width, height, rotation, options);
   }
 
   public function drawText(
