@@ -73,6 +73,17 @@ class CanvasRenderContext implements RenderContext {
     final strokeColor = options != null ? options.stroke : null;
     final strokeWidth = options != null && options.strokeWidth != null ? options.strokeWidth : 1;
 
+    if (camera != null) {
+      context.setTransform(
+        camera.scale,
+        0,
+        0,
+        camera.scale,
+        camera.translation.x,
+        camera.translation.y
+      );
+      context.rotate(camera.rotation);
+    }
     context.lineWidth = strokeWidth;
     context.translate(x, y);
     context.rotate(rotation);
@@ -93,6 +104,18 @@ class CanvasRenderContext implements RenderContext {
     scale:Float = 1,
     ?clip:TextureClip
   ) {
+    if (camera != null) {
+      context.setTransform(
+        camera.scale,
+        0,
+        0,
+        camera.scale,
+        camera.translation.x,
+        camera.translation.y
+      );
+      context.rotate(camera.rotation);
+    }
+
     context.translate(x, y);
     context.rotate(rotation);
     if (clip != null) {
@@ -128,6 +151,18 @@ class CanvasRenderContext implements RenderContext {
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
+    if (camera != null) {
+      context.setTransform(
+        camera.scale,
+        0,
+        0,
+        camera.scale,
+        camera.translation.x,
+        camera.translation.y
+      );
+      context.rotate(2 * Math.PI - camera.rotation);
+    }
+
     context.rotate(0);
     context.textAlign = align;
     context.fillStyle = colorToRGBA(0xFFFFFFFF);

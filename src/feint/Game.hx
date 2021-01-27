@@ -155,6 +155,7 @@ class Game {
     #if debug
     // TODO: Move to debug UI
     if (showDebugUI) {
+      renderer.camera = null;
       @:privateAccess(Renderer)
       if (renderer.renderContext.api == WebGL) {
         var webGLRenderContext:WebGLRenderContext = cast renderer.renderContext;

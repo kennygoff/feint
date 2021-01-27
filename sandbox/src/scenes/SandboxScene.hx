@@ -33,7 +33,7 @@ class SandboxScene extends Scene {
     camera.translation = {x: 40, y: 40};
 
     rects = [
-      for (i in 0...1500)
+      for (i in 0...100)
         {
           x: Math.floor(Math.random() * game.window.width),
           y: Math.floor(Math.random() * game.window.height),
