@@ -32,10 +32,11 @@ interface RenderContext {
     x:Int,
     y:Int,
     assetId:String,
-    ?clip:TextureClip,
-    ?scale:Float,
-    ?textureWidth:Int,
-    ?textureHeight:Int
+    textureWidth:Int,
+    textureHeight:Int,
+    rotation:Float = 0,
+    scale:Float = 1,
+    ?clip:TextureClip
   ):Void;
   public function drawText(
     x:Int,

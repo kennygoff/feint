@@ -245,6 +245,7 @@ class BatchRenderWebGLShader extends WebGLShader {
     clipY1:Float,
     clipY2:Float,
     color:Int,
+    rotation:Float = 0.0,
     textureId:Int = 0
   ) {
     rects.push({
@@ -267,7 +268,10 @@ class BatchRenderWebGLShader extends WebGLShader {
         clipX2, clipY2,
       ],
       translation: [x, y],
-      rotation: [0, 1],
+      rotation: [
+        std.Math.sin(2 * std.Math.PI - rotation),
+        std.Math.cos(2 * std.Math.PI - rotation)
+      ],
       alpha: 1
     });
   }
@@ -305,7 +309,10 @@ class BatchRenderWebGLShader extends WebGLShader {
         1, 1,
       ],
       translation: [x, y],
-      rotation: [std.Math.sin(rotation), std.Math.cos(rotation)],
+      rotation: [
+        std.Math.sin(2 * std.Math.PI - rotation),
+        std.Math.cos(2 * std.Math.PI - rotation)
+      ],
       alpha: 1
     });
   }

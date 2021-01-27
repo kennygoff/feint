@@ -109,29 +109,38 @@ class SandboxScene extends Scene {
         {color: rect.color}
       );
 
-      renderer.drawImage(rect.x + 100, rect.y + 100, Assets.icon__png, {
+      renderer.drawImage(rect.x + 100, rect.y + 100, Assets.icon__png, 512, 512, 0, 0.25, {
         x: 0,
         y: 0,
         width: 512,
         height: 512
-      }, 0.25, 512, 512);
+      });
 
-      renderer.drawImage(rect.x + 100, rect.y + 100, Assets.inwave_labs_discord__png, {
-        x: 0,
-        y: 0,
-        width: 512,
-        height: 512
-      }, 0.25, 512, 512);
+      renderer.drawImage(
+        rect.x + 100,
+        rect.y + 100,
+        Assets.inwave_labs_discord__png,
+        512,
+        512,
+        0,
+        0.25,
+        {
+          x: 0,
+          y: 0,
+          width: 512,
+          height: 512
+        }
+      );
     }
 
     renderer.drawRect(150, 150, 40, 40, Math.PI * rot, {color: 0x550000FF});
 
-    renderer.drawImage(0, 0, Assets.icon__png, {
+    renderer.drawImage(250, 250, Assets.icon__png, 512, 512, Math.PI * 0.01, 1, {
       x: 128,
       y: 128,
       width: 128,
       height: 128
-    }, 1, 512, 512);
+    });
 
     // renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
 

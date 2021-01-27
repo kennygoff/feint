@@ -96,10 +96,11 @@ class WebGLRenderContext implements RenderContext {
     x:Int,
     y:Int,
     assetId:String,
-    ?clip:TextureClip,
-    ?scale:Float = 1,
-    ?textureWidth:Int,
-    ?textureHeight:Int
+    textureWidth:Int,
+    textureHeight:Int,
+    rotation:Float = 0,
+    scale:Float = 1,
+    ?clip:TextureClip
   ) {
     var textureInitialized = textures.exists(assetId);
     var textureLoaded = textureInitialized && textures.get(assetId) != null;
@@ -140,6 +141,7 @@ class WebGLRenderContext implements RenderContext {
         clip.y / textureHeight,
         (clip.y + clip.height) / textureHeight,
         0xFFFFFFFF,
+        rotation,
         textureId[assetId]
       );
     } else {
@@ -149,7 +151,7 @@ class WebGLRenderContext implements RenderContext {
         clip.width * scale,
         clip.height * scale,
         0xFFFFFFFF,
-        0,
+        rotation,
         textureId[assetId]
       );
     }

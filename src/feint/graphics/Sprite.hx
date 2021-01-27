@@ -45,14 +45,23 @@ class Sprite {
 
   public function drawAt(x:Int, y:Int, renderer:Renderer, ?scale:Float) {
     if (animation != null) {
-      renderer.drawImage(x, y, assetId, animation.getFrame(), scale, textureWidth, textureHeight);
+      renderer.drawImage(
+        x,
+        y,
+        assetId,
+        textureWidth,
+        textureHeight,
+        0,
+        scale,
+        animation.getFrame()
+      );
     } else {
-      renderer.drawImage(x, y, assetId, {
+      renderer.drawImage(x, y, assetId, textureWidth, textureHeight, 0, scale, {
         x: 0,
         y: 0,
         width: textureWidth,
         height: textureHeight
-      }, scale, textureWidth, textureHeight);
+      });
     }
   }
 }

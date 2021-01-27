@@ -86,11 +86,14 @@ class CanvasRenderContext implements RenderContext {
     x:Int,
     y:Int,
     assetId:String,
-    ?clip:TextureClip,
-    ?scale:Float,
-    ?textureWidth:Int,
-    ?textureHeight:Int
+    textureWidth:Int,
+    textureHeight:Int,
+    rotation:Float = 0,
+    scale:Float = 1,
+    ?clip:TextureClip
   ) {
+    context.translate(x, y);
+    context.rotate(rotation);
     if (clip != null) {
       if (scale != null) {
         context.drawImage(
@@ -99,8 +102,8 @@ class CanvasRenderContext implements RenderContext {
           clip.y,
           clip.width,
           clip.height,
-          x,
-          y,
+          0,
+          0,
           clip.width * scale,
           clip.height * scale
         );
@@ -111,15 +114,16 @@ class CanvasRenderContext implements RenderContext {
           clip.y,
           clip.width,
           clip.height,
-          x,
-          y,
+          0,
+          0,
           clip.width,
           clip.height
         );
       }
     } else {
-      context.drawImage(cast js.Browser.document.getElementById(assetId), x, y);
+      context.drawImage(cast js.Browser.document.getElementById(assetId), 0, 0);
     }
+    context.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {

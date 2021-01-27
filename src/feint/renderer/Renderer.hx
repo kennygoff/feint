@@ -56,12 +56,13 @@ class Renderer {
     x:Int,
     y:Int,
     assetId:String,
-    ?clip:TextureClip,
-    ?scale:Float,
-    ?textureWidth:Int,
-    ?textureHeight:Int
+    textureWidth:Int,
+    textureHeight:Int,
+    rotation:Float = 0,
+    scale:Float = 1,
+    ?clip:TextureClip
   ) {
-    renderContext.drawImage(x, y, assetId, clip, scale, textureWidth, textureHeight);
+    renderContext.drawImage(x, y, assetId, textureWidth, textureHeight, rotation, scale, clip);
   }
 
   public function submit() {
