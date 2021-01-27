@@ -107,6 +107,7 @@ class Game {
     if (nextScene != null) {
       Logger.info('Switching to scene: ${Type.getClassName(Type.getClass(nextScene))}');
       activeScene = nextScene;
+      renderer.camera = null;
       nextScene = null;
     }
 
@@ -140,6 +141,8 @@ class Game {
     renderer.clear();
 
     if (activeScene != null) {
+      @:privateAccess(Scene)
+      renderer.camera = activeScene.camera;
       activeScene.render(renderer);
     }
 

@@ -40,6 +40,7 @@ typedef RectProperties = {
 class BatchRenderWebGLShader extends WebGLShader {
   public var rects:Array<RectProperties>;
   public var textureObjects:Array<Texture>;
+  public var cameraProjection:Array<Float>;
 
   var color:AttributeLocation;
   var position:AttributeLocation;
@@ -52,9 +53,6 @@ class BatchRenderWebGLShader extends WebGLShader {
   var textures:UniformLocation;
   var projection:UniformLocation;
   var buffer:Buffer;
-
-  // TEMP
-  var temp_translation:Array<Float>;
 
   public function new() {
     this.rects = [];
@@ -166,13 +164,13 @@ class BatchRenderWebGLShader extends WebGLShader {
     var translationMatrix = Matrix.translation(0, 0);
     var rotationMatrix = Matrix.rotation(0);
     var scaleMatrix = Matrix.scaling(1, 1);
-    temp_translation = Matrix.multiply(translationMatrix, rotationMatrix);
+    var temp_translation = Matrix.multiply(translationMatrix, rotationMatrix);
     temp_translation = Matrix.multiply(temp_translation, scaleMatrix);
 
     context.useProgram(program);
     context.uniform2f(resolution, context.canvas.width, context.canvas.height);
     context.uniform1iv(textures, [0, 1, 2, 3, 4, 5, 6, 7]);
-    context.uniformMatrix3fv(projection, false, cast temp_translation);
+    context.uniformMatrix3fv(projection, false, cast cameraProjection);
 
     // Vertex Buffer Object
     context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);

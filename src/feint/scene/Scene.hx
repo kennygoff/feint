@@ -1,11 +1,15 @@
 package feint.scene;
 
+import feint.renderer.Camera;
 import feint.renderer.Renderer;
 
 class Scene {
   var game:Game;
+  var camera:Camera;
 
-  public function new() {}
+  public function new() {
+    camera = new Camera();
+  }
 
   public function init() {}
 

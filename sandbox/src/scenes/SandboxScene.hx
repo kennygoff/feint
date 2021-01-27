@@ -1,5 +1,6 @@
 package scenes;
 
+import feint.input.device.Keyboard.KeyCode;
 import library.systems.SpriteRenderSystem;
 import library.systems.SpriteAnimationSystem;
 import library.components.SpriteComponent;
@@ -28,6 +29,8 @@ class SandboxScene extends Scene {
 
   override function init() {
     super.init();
+
+    camera.translation = {x: 40, y: 40};
 
     rects = [
       for (i in 0...1500)
@@ -92,6 +95,46 @@ class SandboxScene extends Scene {
     rot += elapsed / 3000;
     if (rot >= 2) {
       rot = -2;
+    }
+
+    if (game.window.inputManager.keyboard.keys[KeyCode.W] == Pressed) {
+      camera.translation = {
+        x: camera.translation.x,
+        y: camera.translation.y - (elapsed * 0.25)
+      };
+    } else if (game.window.inputManager.keyboard.keys[KeyCode.S] == Pressed) {
+      camera.translation = {
+        x: camera.translation.x,
+        y: camera.translation.y + (elapsed * 0.25)
+      };
+    } else if (game.window.inputManager.keyboard.keys[KeyCode.A] == Pressed) {
+      camera.translation = {
+        x: camera.translation.x - (elapsed * 0.25),
+        y: camera.translation.y
+      };
+    } else if (game.window.inputManager.keyboard.keys[KeyCode.D] == Pressed) {
+      camera.translation = {
+        x: camera.translation.x + (elapsed * 0.25),
+        y: camera.translation.y
+      };
+    }
+
+    if (game.window.inputManager.keyboard.keys[KeyCode.E] == Pressed) {
+      camera.rotation -= elapsed * 0.001;
+      if (camera.rotation <= -2 * Math.PI) {
+        camera.rotation += 2 * Math.PI;
+      }
+    } else if (game.window.inputManager.keyboard.keys[KeyCode.Q] == Pressed) {
+      camera.rotation += elapsed * 0.001;
+      if (camera.rotation >= 2 * Math.PI) {
+        camera.rotation += -2 * Math.PI;
+      }
+    }
+
+    if (game.window.inputManager.keyboard.keys[KeyCode.Up] == Pressed) {
+      camera.scale += elapsed * 0.005;
+    } else if (game.window.inputManager.keyboard.keys[KeyCode.Down] == Pressed) {
+      camera.scale -= elapsed * 0.005;
     }
   }
 

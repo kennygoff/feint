@@ -21,6 +21,7 @@ class WebGLRenderContext implements RenderContext {
   public var api(default, null):RenderAPI;
   public var width(default, null):Int;
   public var height(default, null):Int;
+  public var camera:Camera;
 
   var canvas:CanvasElement;
   var context:RenderingContext;
@@ -30,6 +31,9 @@ class WebGLRenderContext implements RenderContext {
   var textures:Map<String, ImageElement>;
   var textureId:Map<String, Int>;
   var textureIndex:Array<String>; // TODO: Need an ordered map or something
+
+  // Camera
+  var defaultCamera:Camera;
 
   // TODO: Temp
   var textCanvas:CanvasElement;
@@ -41,6 +45,8 @@ class WebGLRenderContext implements RenderContext {
     this.api = WebGL;
     this.canvas = canvas;
     this.context = context;
+    this.defaultCamera = new Camera();
+    this.camera = this.defaultCamera;
     setup();
   }
 
@@ -71,6 +77,12 @@ class WebGLRenderContext implements RenderContext {
   }
 
   public function submit() {
+    if (camera == null) {
+      batchRender.cameraProjection = defaultCamera.projection;
+    } else {
+      batchRender.cameraProjection = camera.projection;
+    }
+
     batchRender.use(context);
     batchRender.draw(context);
   }

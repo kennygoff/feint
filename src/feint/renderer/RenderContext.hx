@@ -16,6 +16,7 @@ interface RenderContext {
   public var api(default, null):RenderAPI;
   public var width(default, null):Int;
   public var height(default, null):Int;
+  public var camera:Camera;
 
   public function clear(color:Int = 0xFF000000):Void;
   public function resize(width:Int, height:Int):Void;

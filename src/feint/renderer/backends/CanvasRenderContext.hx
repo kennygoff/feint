@@ -12,6 +12,7 @@ class CanvasRenderContext implements RenderContext {
   public var api(default, null):RenderAPI;
   public var width(default, null):Int;
   public var height(default, null):Int;
+  public var camera:Camera;
 
   var canvas:CanvasElement;
   var context:CanvasRenderingContext2D;

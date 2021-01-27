@@ -20,6 +20,8 @@ enum abstract TextAlign(String) to String {
 }
 
 class Renderer {
+  public var camera(get, set):Camera;
+
   var renderContext:RenderContext;
 
   public function new(renderContext:RenderContext) {
@@ -67,5 +69,14 @@ class Renderer {
 
   public function submit() {
     renderContext.submit();
+  }
+
+  public function get_camera():Camera {
+    return renderContext.camera;
+  }
+
+  public function set_camera(camera:Camera):Camera {
+    renderContext.camera = camera;
+    return renderContext.camera;
   }
 }
