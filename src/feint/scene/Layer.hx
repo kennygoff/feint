@@ -2,6 +2,7 @@ package feint.scene;
 
 import feint.renderer.Camera;
 
+@:dox(hide)
 class Layer {
   var camera:Camera;
 

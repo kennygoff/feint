@@ -7,6 +7,9 @@ import haxe.macro.Expr;
 using haxe.macro.Tools;
 #end
 
+/**
+ * Enum utility macros.
+ */
 class EnumTools {
   /**
    * Get array of all values of a given abstract enum.
@@ -43,12 +46,6 @@ class EnumTools {
     }
   }
 
-  /**
-   * Get array of all values of a given abstract enum.
-   * @param typePath Abstract enum
-   * @return Array of values from enum
-   * @see https://code.haxe.org/category/macros/enum-abstract-values.html
-   */
   /**
    * Extract underlying value defined by an enum constructor. A shorthand for using the switch syntax, in order to access the underlying value more easily.
    * @param value Enum Value, must be defined by enum contrsuctor

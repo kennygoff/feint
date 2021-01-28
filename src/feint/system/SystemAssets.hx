@@ -4,6 +4,10 @@ package feint.system;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
+/**
+ * @deprecated
+ */
+@:dox(hide)
 class SystemAssets {
   macro static public function buildAssets():Array<Field> {
     // Context.resolvePath(dir)
