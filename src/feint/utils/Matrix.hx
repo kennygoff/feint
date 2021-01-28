@@ -1,6 +1,15 @@
 package feint.utils;
 
+/**
+ * Utility class for doing matrix math for 3x3 matrices.
+ */
 class Matrix {
+  /**
+   * Multiply two 3x3 matrices together.
+   * @param a A 3x3 matrix
+   * @param b Another 3x3 matrix
+   * @return A product of multiplaying the two 3x3 maxtrices
+   */
   public static function multiply(a:Array<Float>, b:Array<Float>):Array<Float> {
     var a00 = a[0 * 3 + 0];
     var a01 = a[0 * 3 + 1];
@@ -34,6 +43,12 @@ class Matrix {
     ];
   }
 
+  /**
+   * Construct a translation matrix from a x and y values.
+   * @param tx X translation value
+   * @param ty Y translation value
+   * @return 3x3 translation matrix
+   */
   public static function translation(tx:Float, ty:Float):Array<Float> {
     return [
        1,  0, 0,
@@ -42,6 +57,11 @@ class Matrix {
     ];
   }
 
+  /**
+   * Construct a rotation matrix from an angle in radians.
+   * @param angleInRadians [radians] An angle
+   * @return 3x3 rotation matrix
+   */
   public static function rotation(angleInRadians:Float):Array<Float> {
     var c = std.Math.cos(angleInRadians);
     var s = std.Math.sin(angleInRadians);
@@ -52,6 +72,12 @@ class Matrix {
     ];
   }
 
+  /**
+   * Construct a scaling matrix from x and y scale factors.
+   * @param sx X axis scale factor
+   * @param sy Y axis scale factor
+   * @return 3x3 scaling matrix
+   */
   public static function scaling(sx:Float, sy:Float):Array<Float> {
     return [
       sx,  0, 0,
