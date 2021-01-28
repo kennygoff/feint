@@ -20,7 +20,7 @@ class SpriteRenderSystem extends RenderSystem {
     var sprites:Array<Shape> = cast forge.getShapes([SpriteComponent, PositionComponent]);
     var visibleSprites = sprites.filter(sprite -> sprite.sprite.sprite.alpha > 0);
 
-    for (sprite in sprites) {
+    for (sprite in visibleSprites) {
       sprite.sprite.sprite.drawAt(
         Math.floor(sprite.position.x),
         Math.floor(sprite.position.y),

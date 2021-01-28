@@ -85,6 +85,9 @@ class WebGLRenderContext implements RenderContext {
 
     batchRender.use(context);
     batchRender.draw(context);
+
+    // TODO: Temporary so we can submit multiple times with different batches
+    batchRender.rects = [];
   }
 
   public function resize(width:Int, height:Int) {
@@ -177,6 +180,7 @@ class WebGLRenderContext implements RenderContext {
     // https://css-tricks.com/techniques-for-rendering-text-with-webgl/
 
     if (textRenderContext != null) {
+      textRenderContext.camera = camera;
       textRenderContext.drawText(x, y, text, fontSize, font, align);
     }
 

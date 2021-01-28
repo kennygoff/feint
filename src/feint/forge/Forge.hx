@@ -38,6 +38,15 @@ class Forge {
   }
 
   /**
+   * Create and entity with new id using `Entity.create()` with given components
+   * @param comps Array of components registered to this Entity
+   * @param labels (Optional) Array of labels for filtering in systems
+   */
+  public function createEntity(comps:Array<Component>, ?labels:Array<String>) {
+    addEntity(Entity.create(), comps, labels);
+  }
+
+  /**
    * Add entity by id with given components
    * @param id Entity id
    * @param comps Array of components registered to this Entity
@@ -150,8 +159,20 @@ class Forge {
     map.remove(entityId);
   }
 
+  public function addSystems(systems:Array<System>) {
+    for (system in systems) {
+      addSystem(system);
+    }
+  }
+
   public function addSystem(system:System) {
     systems.push(system);
+  }
+
+  public function addRenderSystems(systems:Array<RenderSystem>) {
+    for (system in systems) {
+      addRenderSystem(system);
+    }
   }
 
   public function addRenderSystem(system:RenderSystem) {

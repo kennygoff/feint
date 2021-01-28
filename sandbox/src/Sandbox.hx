@@ -4,7 +4,7 @@ import feint.Application;
 
 class Sandbox extends Application {
   override public function init() {
-    game.setInitialScene(new scenes.SandboxScene());
+    game.setInitialScene(new scenes.LayersScene());
   }
 
   static public function main() {
