@@ -11,10 +11,9 @@ import library.components.SpriteComponent;
 import feint.forge.Forge;
 import feint.renderer.Camera;
 import feint.renderer.Renderer;
-import feint.scene.Layer;
 import feint.scene.Scene;
 
-class LayersScene extends Scene {
+class CamerasScene extends Scene {
   var forge:Forge;
   var backgroundCamera:Camera;
   var uiCamera:Camera;
