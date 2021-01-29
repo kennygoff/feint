@@ -4,8 +4,8 @@
   "license": "MIT",
   "tags": [],
   "description": "A game engine for crafting 2D games in Haxe",
-  "version": "0.1.0",
-  "releasenote": "Core framework, Canvas renderer, and Forge ECS",
+  "version": "0.2.0",
+  "releasenote": "WebGL Renderer, Forge shapes, HTML5 Debugging",
   "contributors": ["Kenny"],
   "classPath": "src",
   "dependencies": {}
