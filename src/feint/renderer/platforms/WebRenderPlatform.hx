@@ -7,7 +7,29 @@ import feint.debug.Logger;
 import js.html.CanvasElement;
 import feint.renderer.RenderContext.RenderAPI;
 
+/**
+ * Render platform that manages and creates the context for a Feint
+ * application on the Javascript target.
+ *
+ * Defaults to WebGL with a Canvas fallback.
+ */
 class WebRenderPlatform {
+  /**
+   * Create a new render context based with a preferred API.
+   *
+   * Available API options:
+   *
+   * - `RenderAPI.WebGL2`: Not yet supported, please use `RenderAPI.WebGL`
+   * - `RenderAPI.WebGL` (default): Attempts to use WebGL API, will fallback
+   * to Canvas if WebGL is not supported
+   * - `RenderAPI.Canvas`: Attempts to use Canvas, will show an error if
+   * unsupported
+   *
+   * @param width Width of the viewport
+   * @param height Height of the viewport
+   * @param api Preferred Web render API
+   * @return RenderContext
+   */
   public static function createContext(
     width:Int,
     height:Int,
