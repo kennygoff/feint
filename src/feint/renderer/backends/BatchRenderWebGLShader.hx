@@ -161,6 +161,14 @@ class BatchRenderWebGLShader extends WebGLShader {
   override public function globals(context:RenderingContext) {}
 
   override public function draw(context:RenderingContext) {
+    if (rects.length == 0) {
+      // TODO: See if this even makes sense to warn about
+      Logger.warn(
+        "Attempting to draw without no vertices, you're likely submitting a render call without queuing any quads to the batch."
+      );
+      return;
+    }
+
     // Global uniforms, won't change per instance
     // TODO: Move to use()
 
@@ -256,6 +264,11 @@ class BatchRenderWebGLShader extends WebGLShader {
       // TODO: Determine size allowed for machine
       // TODO: Send in multiple batches if larger
       Logger.warn('Nearing WebGL limit of vertices! ${count}/65535');
+    } else if (count == 0) {
+      Logger.error(
+        "Attempting to draw without no vertices, you're likely submitting a render call without queuing any quads to the batch."
+      );
+      return;
     }
     context.drawArrays(primitiveType, offset, count);
   }

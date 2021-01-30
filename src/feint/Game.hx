@@ -146,7 +146,20 @@ class Game {
       activeScene.render(renderer);
     }
 
+    #if (debug && js)
+    // Avoid an extra draw call if there's nothing to draw
+    // Also happens if the Scene already submitted a draw call of the buffer manually
+    @:privateAccess(Renderer)
+    if (renderer.renderContext.api == WebGL) {
+      @:privateAccess(Renderer)
+      var webGLRenderContext = cast(renderer.renderContext, WebGLRenderContext);
+      if (webGLRenderContext.batchRender.rects.length > 0) {
+        renderer.submit();
+      }
+    }
+    #else
     renderer.submit();
+    #end
 
     #if debug
     frameRenderTime = Date.now().getTime() - renderTime;
