@@ -55,7 +55,9 @@ class WebGLRenderContext implements RenderContext {
     // See: https://webglfundamentals.org/webgl/lessons/webgl-resizing-the-canvas.html
     context.viewport(0, 0, context.canvas.width, context.canvas.height);
     context.clearColor(0, 0, 0, 1);
-    context.clear(RenderingContext.COLOR_BUFFER_BIT);
+    context.clearDepth(1);
+    context.clear(RenderingContext.DEPTH_BUFFER_BIT | RenderingContext.COLOR_BUFFER_BIT);
+    context.flush();
     // context.pixelStorei(RenderingContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
     // context.blendFunc(RenderingContext.ONE, RenderingContext.ONE_MINUS_SRC_ALPHA);
     // context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
@@ -101,10 +103,11 @@ class WebGLRenderContext implements RenderContext {
     width:Int,
     height:Int,
     rotation:Float = 0.0,
-    ?options:RendererPrimitiveOptions
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0
   ) {
-    var color = options != null && options.color != null ? options.color : 0xFFFFFFFF;
-    batchRender.addRect(x, y, width, height, color, rotation);
+    batchRender.addRect(x, y, width, height, color, rotation, alpha, depth);
   }
 
   public function drawImage(
@@ -115,6 +118,9 @@ class WebGLRenderContext implements RenderContext {
     textureHeight:Int,
     rotation:Float = 0,
     scale:Float = 1,
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0,
     ?clip:TextureClip
   ) {
     var textureInitialized = textures.exists(assetId);
@@ -155,8 +161,10 @@ class WebGLRenderContext implements RenderContext {
         (clip.x + clip.width) / textureWidth,
         clip.y / textureHeight,
         (clip.y + clip.height) / textureHeight,
-        0xFFFFFFFF,
+        color,
         rotation,
+        alpha,
+        depth,
         textureId[assetId]
       );
     } else {
@@ -165,8 +173,10 @@ class WebGLRenderContext implements RenderContext {
         y,
         clip.width * scale,
         clip.height * scale,
-        0xFFFFFFFF,
+        color,
         rotation,
+        alpha,
+        depth,
         textureId[assetId]
       );
     }
@@ -217,6 +227,12 @@ class WebGLRenderContext implements RenderContext {
     // Allows alpha blending for transparency in textures
     context.enable(RenderingContext.BLEND);
     context.blendFunc(RenderingContext.SRC_ALPHA, RenderingContext.ONE_MINUS_SRC_ALPHA);
+
+    // Depth
+    context.enable(RenderingContext.DEPTH_TEST);
+    context.depthMask(true);
+    context.depthFunc(RenderingContext.LEQUAL);
+    context.depthRange(0.0, 1.0);
 
     setupTextRenderContext();
   }

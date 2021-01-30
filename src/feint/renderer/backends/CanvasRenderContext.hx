@@ -46,7 +46,7 @@ class CanvasRenderContext implements RenderContext {
 
   public function clear(color:Int = 0xFF000000) {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    drawRect(0, 0, canvas.width, canvas.height, 0, {color: color});
+    drawRect(0, 0, canvas.width, canvas.height, 0, color);
     context.rotate(0);
   }
 
@@ -67,11 +67,13 @@ class CanvasRenderContext implements RenderContext {
     width:Int,
     height:Int,
     rotation:Float = 0.0,
-    ?options:RendererPrimitiveOptions
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0
   ) {
-    final fillColor = options != null ? options.color : null;
-    final strokeColor = options != null ? options.stroke : null;
-    final strokeWidth = options != null && options.strokeWidth != null ? options.strokeWidth : 1;
+    // final fillColor = options != null ? options.color : null;
+    // final strokeColor = options != null ? options.stroke : null;
+    // final strokeWidth = options != null && options.strokeWidth != null ? options.strokeWidth : 1;
 
     if (camera != null) {
       context.setTransform(
@@ -84,13 +86,13 @@ class CanvasRenderContext implements RenderContext {
       );
       context.rotate(camera.rotation);
     }
-    context.lineWidth = strokeWidth;
+    // context.lineWidth = strokeWidth;
     context.translate(x, y);
     context.rotate(rotation);
-    context.strokeStyle = colorToRGBA(strokeColor);
-    context.fillStyle = colorToRGBA(fillColor);
+    // context.strokeStyle = colorToRGBA(strokeColor);
+    context.fillStyle = colorToRGBA(color);
     context.fillRect(0, 0, width, height);
-    context.strokeRect(0, 0, width, height);
+    // context.strokeRect(0, 0, width, height);
     context.setTransform(1, 0, 0, 1, 0, 0);
   }
 
@@ -102,6 +104,9 @@ class CanvasRenderContext implements RenderContext {
     textureHeight:Int,
     rotation:Float = 0,
     scale:Float = 1,
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0,
     ?clip:TextureClip
   ) {
     if (camera != null) {

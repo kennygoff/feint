@@ -35,6 +35,7 @@ typedef RectProperties = {
   var translation:Array<Float>; // Vec2(XY): Translate
   var rotation:Array<Float>; // Vec2(XY): Rotation
   var alpha:Float; // Float: Alpha
+  var depth:Float; // Float: Layer aka Z aka Depth; 0-1 0 being closest to the camera
 }
 
 class BatchRenderWebGLShader extends WebGLShader {
@@ -49,6 +50,7 @@ class BatchRenderWebGLShader extends WebGLShader {
   var rotation:AttributeLocation;
   var translation:AttributeLocation;
   var alpha:AttributeLocation;
+  var depth:AttributeLocation;
   var resolution:UniformLocation;
   var textures:UniformLocation;
   var projection:UniformLocation;
@@ -68,6 +70,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       attribute vec2 a_translation;
       attribute vec2 a_rotation;
       attribute float a_alpha;
+      attribute float a_depth;
 
       uniform vec2 u_resolution;
       uniform mat3 u_projection;
@@ -94,8 +97,8 @@ class BatchRenderWebGLShader extends WebGLShader {
     
         // convert from 0->2 to -1->+1 (clip space)
         vec2 clipSpace = zeroToTwo - 1.0;
-    
-        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+
+        gl_Position = vec4(clipSpace * vec2(1, -1), a_depth, 1);
         v_color = a_color;
         v_textureIndex = a_textureIndex;
         v_textureCoordinate = a_textureCoordinate;
@@ -145,6 +148,7 @@ class BatchRenderWebGLShader extends WebGLShader {
     translation = context.getAttribLocation(program, 'a_translation');
     rotation = context.getAttribLocation(program, 'a_rotation');
     alpha = context.getAttribLocation(program, 'a_alpha');
+    depth = context.getAttribLocation(program, 'a_depth');
     resolution = context.getUniformLocation(program, 'u_resolution');
     textures = context.getUniformLocation(program, 'u_textures');
     projection = context.getUniformLocation(program, 'u_projection');
@@ -167,7 +171,7 @@ class BatchRenderWebGLShader extends WebGLShader {
     var temp_translation = Matrix.multiply(translationMatrix, rotationMatrix);
     temp_translation = Matrix.multiply(temp_translation, scaleMatrix);
 
-    context.useProgram(program);
+    // context.useProgram(program);
     context.uniform2f(resolution, context.canvas.width, context.canvas.height);
     context.uniform1iv(textures, [0, 1, 2, 3, 4, 5, 6, 7]);
     context.uniformMatrix3fv(projection, false, cast cameraProjection);
@@ -175,33 +179,56 @@ class BatchRenderWebGLShader extends WebGLShader {
     // Vertex Buffer Object
     context.bindBuffer(RenderingContext.ARRAY_BUFFER, buffer);
 
+    // Vertex size
+    var stride = (2 + 4 + 1 + 2 + 2 + 2 + 1 + 1) * 4;
+    var offset = 0;
+
     // Vertex Positions
     context.enableVertexAttribArray(position);
-    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, 56, 0);
+    context.vertexAttribPointer(position, 2, RenderingContext.FLOAT, false, stride, offset);
+    offset += 2 * 4;
 
     // Vertex Colors
     context.enableVertexAttribArray(color);
-    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, 56, 8);
+    context.vertexAttribPointer(color, 4, RenderingContext.FLOAT, false, stride, offset);
+    offset += 4 * 4;
 
     // Vertex Texture Index
     context.enableVertexAttribArray(textureIndex);
-    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, 56, 24);
+    context.vertexAttribPointer(textureIndex, 1, RenderingContext.FLOAT, false, stride, offset);
+    offset += 1 * 4;
 
     // Vertex Texture Coordinate
     context.enableVertexAttribArray(textureCoordinate);
-    context.vertexAttribPointer(textureCoordinate, 2, RenderingContext.FLOAT, false, 56, 28);
+    context.vertexAttribPointer(
+      textureCoordinate,
+      2,
+      RenderingContext.FLOAT,
+      false,
+      stride,
+      offset
+    );
+    offset += 2 * 4;
 
     // Vertex Translate
     context.enableVertexAttribArray(translation);
-    context.vertexAttribPointer(translation, 2, RenderingContext.FLOAT, false, 56, 36);
+    context.vertexAttribPointer(translation, 2, RenderingContext.FLOAT, false, stride, offset);
+    offset += 2 * 4;
 
     // Vertex Rotation
     context.enableVertexAttribArray(rotation);
-    context.vertexAttribPointer(rotation, 2, RenderingContext.FLOAT, false, 56, 44);
+    context.vertexAttribPointer(rotation, 2, RenderingContext.FLOAT, false, stride, offset);
+    offset += 2 * 4;
 
     // Vertex Alpha
     context.enableVertexAttribArray(alpha);
-    context.vertexAttribPointer(alpha, 1, RenderingContext.FLOAT, false, 56, 52);
+    context.vertexAttribPointer(alpha, 1, RenderingContext.FLOAT, false, stride, offset);
+    offset += 1 * 4;
+
+    // Vertex Depth
+    context.enableVertexAttribArray(depth);
+    context.vertexAttribPointer(depth, 1, RenderingContext.FLOAT, false, stride, offset);
+    offset += 1 * 4;
 
     #if (debug && false)
     // Profiling for adding data to the buffer
@@ -244,6 +271,8 @@ class BatchRenderWebGLShader extends WebGLShader {
     clipY2:Float,
     color:Int,
     rotation:Float = 0.0,
+    alpha:Float = 1.0,
+    depth:Float = 0.0,
     textureId:Int = 0
   ) {
     rects.push({
@@ -270,7 +299,8 @@ class BatchRenderWebGLShader extends WebGLShader {
         std.Math.sin(2 * std.Math.PI - rotation),
         std.Math.cos(2 * std.Math.PI - rotation)
       ],
-      alpha: 1
+      alpha: alpha,
+      depth: depth
     });
   }
 
@@ -281,6 +311,8 @@ class BatchRenderWebGLShader extends WebGLShader {
     height:Float,
     color:Int,
     rotation:Float = 0.0,
+    alpha:Float = 1.0,
+    depth:Float = 0.0,
     textureId:Int = 0
   ) {
     var x1 = x;
@@ -311,7 +343,8 @@ class BatchRenderWebGLShader extends WebGLShader {
         std.Math.sin(2 * std.Math.PI - rotation),
         std.Math.cos(2 * std.Math.PI - rotation)
       ],
-      alpha: 1
+      alpha: alpha,
+      depth: depth
     });
   }
 
@@ -446,7 +479,7 @@ class BatchRenderWebGLShader extends WebGLShader {
 
   function rectsToBufferData(rects:Array<RectProperties>):Float32Array {
     var verticesPerRect = 6;
-    var floatsPerVertex = 14;
+    var floatsPerVertex = 15;
     var bufferSize = rects.length * verticesPerRect * floatsPerVertex;
     var bufferData = new js.lib.Float32Array(bufferSize);
     var bi = 0; // Buffer index
@@ -465,6 +498,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
 
       bufferData[bi++] = rects[i].positions[2];
       bufferData[bi++] = rects[i].positions[3];
@@ -480,6 +514,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
 
       bufferData[bi++] = rects[i].positions[4];
       bufferData[bi++] = rects[i].positions[5];
@@ -495,6 +530,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
 
       bufferData[bi++] = rects[i].positions[6];
       bufferData[bi++] = rects[i].positions[7];
@@ -510,6 +546,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
 
       bufferData[bi++] = rects[i].positions[8];
       bufferData[bi++] = rects[i].positions[9];
@@ -525,6 +562,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
 
       bufferData[bi++] = rects[i].positions[10];
       bufferData[bi++] = rects[i].positions[11];
@@ -540,6 +578,7 @@ class BatchRenderWebGLShader extends WebGLShader {
       bufferData[bi++] = rects[i].rotation[0];
       bufferData[bi++] = rects[i].rotation[1];
       bufferData[bi++] = rects[i].alpha;
+      bufferData[bi++] = rects[i].depth;
     }
     return bufferData;
   }

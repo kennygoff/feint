@@ -140,17 +140,10 @@ class SandboxScene extends Scene {
 
   override function render(renderer:Renderer) {
     super.render(renderer);
-    renderer.drawRect(50, 50, 100, 100, {color: 0xFF00FFFF});
-    renderer.drawRect(200, 200, 100, 100, {color: 0xFFFF0000});
+    renderer.drawRect(50, 50, 100, 100, 0, 0xFF00FFFF);
+    renderer.drawRect(200, 200, 100, 100, 0, 0xFFFF0000);
     for (rect in rects) {
-      renderer.drawRect(
-        rect.x,
-        rect.y,
-        rect.width,
-        rect.height,
-        rect.rotation,
-        {color: rect.color}
-      );
+      renderer.drawRect(rect.x, rect.y, rect.width, rect.height, rect.rotation, rect.color);
 
       renderer.drawImage(rect.x + 100, rect.y + 100, Assets.icon__png, 512, 512, 0, 0.25, {
         x: 0,
@@ -176,7 +169,7 @@ class SandboxScene extends Scene {
       );
     }
 
-    renderer.drawRect(150, 150, 40, 40, Math.PI * rot, {color: 0x550000FF});
+    renderer.drawRect(150, 150, 40, 40, Math.PI * rot, 0x550000FF);
 
     renderer.drawImage(250, 250, Assets.icon__png, 512, 512, Math.PI * 0.01, 1, {
       x: 128,

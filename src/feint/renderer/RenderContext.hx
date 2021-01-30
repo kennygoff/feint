@@ -27,7 +27,9 @@ interface RenderContext {
     width:Int,
     height:Int,
     rotation:Float = 0.0,
-    ?options:RendererPrimitiveOptions
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0
   ):Void;
   public function drawImage(
     x:Int,
@@ -37,6 +39,9 @@ interface RenderContext {
     textureHeight:Int,
     rotation:Float = 0,
     scale:Float = 1,
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0,
     ?clip:TextureClip
   ):Void;
   public function drawText(

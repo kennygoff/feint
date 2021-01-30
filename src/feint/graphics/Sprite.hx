@@ -53,15 +53,30 @@ class Sprite {
         textureHeight,
         0,
         scale,
+        0xFFFFFFFF,
+        1.0,
+        0.5,
         animation.getFrame()
       );
     } else {
-      renderer.drawImage(x, y, assetId, textureWidth, textureHeight, 0, scale, {
-        x: 0,
-        y: 0,
-        width: textureWidth,
-        height: textureHeight
-      });
+      renderer.drawImage(
+        x,
+        y,
+        assetId,
+        textureWidth,
+        textureHeight,
+        0,
+        scale,
+        0xFFFFFFFF,
+        1.0,
+        0.5,
+        {
+          x: 0,
+          y: 0,
+          width: textureWidth,
+          height: textureHeight
+        }
+      );
     }
   }
 }

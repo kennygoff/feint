@@ -96,12 +96,12 @@ class CamerasScene extends Scene {
     forge.render(renderer);
 
     renderer.camera = camera;
-    renderer.drawRect(0, 100, 50, 50, 0, {color: 0xFF00FFFF});
+    renderer.drawRect(0, 100, 50, 50, 0, 0xFF00FFFF, 1.0, 0.5);
     renderer.drawText(0, 100, 'World', 16, 'sans-serif');
     renderer.submit();
 
     renderer.camera = uiCamera;
-    renderer.drawRect(0, 200, 50, 50, 0, {color: 0xFFFF00FF});
+    renderer.drawRect(0, 200, 50, 50, 0, 0xFFFF00FF, 1.0, 0.0);
     renderer.drawText(0, 200, 'UI', 16, 'sans-serif');
     renderer.submit();
   }

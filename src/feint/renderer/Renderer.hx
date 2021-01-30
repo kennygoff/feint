@@ -71,9 +71,11 @@ class Renderer {
     width:Int,
     height:Int,
     rotation:Float = 0.0,
-    ?options:RendererPrimitiveOptions
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0
   ) {
-    renderContext.drawRect(x, y, width, height, rotation, options);
+    renderContext.drawRect(x, y, width, height, rotation, color, alpha, depth);
   }
 
   /**
@@ -126,9 +128,24 @@ class Renderer {
     textureHeight:Int,
     rotation:Float = 0,
     scale:Float = 1,
+    color:Int = 0xFFFFFFFF,
+    alpha:Float = 1.0,
+    depth:Float = 1.0,
     ?clip:TextureClip
   ) {
-    renderContext.drawImage(x, y, assetId, textureWidth, textureHeight, rotation, scale, clip);
+    renderContext.drawImage(
+      x,
+      y,
+      assetId,
+      textureWidth,
+      textureHeight,
+      rotation,
+      scale,
+      color,
+      alpha,
+      depth,
+      clip
+    );
   }
 
   /**
