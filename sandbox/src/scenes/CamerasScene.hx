@@ -17,6 +17,7 @@ class CamerasScene extends Scene {
   var forge:Forge;
   var backgroundCamera:Camera;
   var uiCamera:Camera;
+  var rot:Float = 0.0;
 
   override function init() {
     super.init();
@@ -87,6 +88,12 @@ class CamerasScene extends Scene {
         y: backgroundCamera.translation.y
       };
     }
+
+    rot += elapsed / 1000;
+    if (rot > 2) {
+      rot -= 4;
+    }
+    // rot = feint.utils.Math.clampFloat(rot, -2, 2);
   }
 
   override function render(renderer:Renderer) {
@@ -96,7 +103,8 @@ class CamerasScene extends Scene {
     forge.render(renderer);
 
     renderer.camera = camera;
-    renderer.drawRect(0, 100, 50, 50, 0, 0xFF00FFFF, 1.0, 0.5);
+    renderer.drawRect(50, 100, 50, 50, 0, 0x5500FFFF, 1.0, 0.5);
+    renderer.drawRect(50, 100, 50, 50, Math.PI * rot, 0xFF00FFFF, 1.0, 0.5);
     renderer.drawText(0, 100, 'World', 16, 'sans-serif');
     renderer.submit();
 

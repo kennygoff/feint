@@ -328,10 +328,13 @@ class BatchRenderWebGLShader extends WebGLShader {
     depth:Float = 0.0,
     textureId:Int = 0
   ) {
-    var x1 = x;
-    var x2 = x + width;
-    var y1 = y;
-    var y2 = y + height;
+    var xOrigin = width / 2;
+    var yOrigin = height / 2;
+    var xRotation = std.Math.sin(2 * std.Math.PI - rotation);
+    var yRotation = std.Math.cos(2 * std.Math.PI - rotation);
+    //     vec2 rotatedPosition = vec2(
+    //       a_position.x * a_rotation.y + a_position.y * a_rotation.x,
+    //       a_position.y * a_rotation.y - a_position.x * a_rotation.x);
     rects.push({
       positions: [
             0,      0,
@@ -351,11 +354,11 @@ class BatchRenderWebGLShader extends WebGLShader {
         1, 0,
         1, 1,
       ],
-      translation: [x, y],
-      rotation: [
-        std.Math.sin(2 * std.Math.PI - rotation),
-        std.Math.cos(2 * std.Math.PI - rotation)
+      translation: [
+        x + xOrigin - ((xOrigin * yRotation) + (yOrigin * xRotation)),
+        y + yOrigin - ((yOrigin * yRotation) - (xOrigin * xRotation))
       ],
+      rotation: [xRotation, yRotation],
       alpha: alpha,
       depth: depth
     });
