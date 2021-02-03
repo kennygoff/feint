@@ -1,17 +1,17 @@
 package scenes;
 
 import feint.input.device.Keyboard.KeyCode;
-import library.systems.SpriteRenderSystem;
-import library.systems.SpriteAnimationSystem;
-import library.components.SpriteComponent;
-import library.components.HitboxComponent;
-import library.components.PositionComponent;
 import feint.forge.Entity;
 import feint.forge.Forge;
 import feint.graphics.Sprite;
 import feint.assets.Assets;
 import feint.renderer.Renderer;
 import feint.scene.Scene;
+import feint.library.SpriteRenderSystem;
+import feint.library.SpriteAnimationSystem;
+import feint.library.SpriteComponent;
+import feint.library.HitboxComponent;
+import feint.library.PositionComponent;
 
 typedef Rect = {
   var x:Int;

@@ -2,16 +2,16 @@ package scenes;
 
 import library.systems.BackgroundGridRenderSystem;
 import feint.input.device.Keyboard.KeyCode;
-import library.systems.SpriteRenderSystem;
-import library.systems.SpriteAnimationSystem;
-import library.components.PositionComponent;
 import feint.assets.Assets;
 import feint.graphics.Sprite;
-import library.components.SpriteComponent;
 import feint.forge.Forge;
 import feint.renderer.Camera;
 import feint.renderer.Renderer;
 import feint.scene.Scene;
+import feint.library.SpriteComponent;
+import feint.library.SpriteRenderSystem;
+import feint.library.SpriteAnimationSystem;
+import feint.library.PositionComponent;
 
 class CamerasScene extends Scene {
   var forge:Forge;
