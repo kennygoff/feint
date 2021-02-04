@@ -465,6 +465,16 @@ class BatchRenderWebGLShader extends WebGLShader {
     if (useMipMap) {
       // Yes, it's a power of 2. Generate mips.
       context.generateMipmap(RenderingContext.TEXTURE_2D);
+      context.texParameteri(
+        RenderingContext.TEXTURE_2D,
+        RenderingContext.TEXTURE_MIN_FILTER,
+        RenderingContext.NEAREST // LINEAR for non-pixel art
+      );
+      context.texParameterf(
+        RenderingContext.TEXTURE_2D,
+        RenderingContext.TEXTURE_MAG_FILTER,
+        RenderingContext.NEAREST
+      );
     } else {
       // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
       context.texParameteri(

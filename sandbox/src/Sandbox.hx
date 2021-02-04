@@ -4,7 +4,7 @@ import feint.Application;
 
 class Sandbox extends Application {
   override public function init() {
-    game.setInitialScene(new scenes.CamerasScene());
+    game.setInitialScene(new scenes.BitmapFontScene());
   }
 
   static public function main() {

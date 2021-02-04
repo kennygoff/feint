@@ -135,6 +135,8 @@ class AssetBuilder {
         ::if (type == "image")::
           <img id="::id::" src="::relativePath::" style="display: none;"/>
         ::elseif (type == "font")::
+        ::elseif (type == "bitmapfont")::
+          <script id="::id::" type="text/plain">::textContent::</script>
         ::elseif (type == "audio")::
           <audio id="::id::" src="::relativePath::" preload="auto" style="display: none;" />
         ::end::
@@ -149,7 +151,8 @@ class AssetBuilder {
     "woff" => "font",
     "woff2" => "font",
     "ttf" => "font",
-    "ogg" => "audio"
+    "ogg" => "audio",
+    "fnt" => "bitmapfont"
   ];
 
   public static function generateHtml(assetPaths:Array<String>) {
@@ -189,7 +192,10 @@ class AssetBuilder {
           {
             id: path.split('/').pop().split("-").join("_").split(".").join("__"),
             type: assetTypes.get(path.split('.').pop()),
-            relativePath: path.split(buildWebFolder + "/").pop()
+            relativePath: path.split(buildWebFolder + "/").pop(),
+            textContent: assetTypes.get(
+              path.split('.').pop()
+            ) == 'bitmapfont' ? File.getContent(path) : ''
           }
       ],
       webFonts: [
