@@ -173,9 +173,9 @@ class Game {
       if (renderer.renderContext.api == WebGL) {
         var webGLRenderContext:WebGLRenderContext = cast renderer.renderContext;
         @:privateAccess(WebGLRenderContext)
-        webGLRenderContext.textRenderContext.drawRect(4, 4, 130, 62, 0xBB000000);
+        webGLRenderContext.textRenderContext.drawRect(4, 4, 130, 62, 0, 0xBB000000);
       } else {
-        renderer.drawRect(4, 4, 130, 62, 0xBB000000);
+        renderer.drawRect(4, 4, 130, 62, 0, 0xBB000000);
       }
 
       renderer.drawText(8, 8 + 2, 'FPS: ${fps}', 16, 'sans-serif');
