@@ -1,5 +1,9 @@
 package feint.renderer.backends;
 
+import haxe.crypto.Base64;
+import js.html.Image;
+import js.html.ImageElement;
+import feint.assets.macros.AssetEmbed;
 import feint.debug.FeintException;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
@@ -88,7 +92,9 @@ class CanvasRenderContext implements RenderContext {
     }
     // context.lineWidth = strokeWidth;
     context.translate(x, y);
+    context.translate(width / 2, height / 2);
     context.rotate(rotation);
+    context.translate(-width / 2, -height / 2);
     // context.strokeStyle = colorToRGBA(strokeColor);
     context.fillStyle = colorToRGBA(color);
     context.fillRect(0, 0, width, height);
@@ -121,12 +127,22 @@ class CanvasRenderContext implements RenderContext {
       context.rotate(camera.rotation);
     }
 
+    var textureEmbedded = AssetEmbed.embeddedAssets.exists(assetId);
+    var image:ImageElement;
+    if (textureEmbedded) {
+      image = new Image();
+      var embeddedBytes = AssetEmbed.embeddedAssets.get(assetId);
+      image.src = "data:image/png;base64," + Base64.encode(embeddedBytes);
+    } else {
+      image = cast js.Browser.document.getElementById(assetId);
+    }
+
     context.translate(x, y);
     context.rotate(rotation);
     if (clip != null) {
       if (scale != null) {
         context.drawImage(
-          cast js.Browser.document.getElementById(assetId),
+          image,
           clip.x,
           clip.y,
           clip.width,
@@ -138,7 +154,7 @@ class CanvasRenderContext implements RenderContext {
         );
       } else {
         context.drawImage(
-          cast js.Browser.document.getElementById(assetId),
+          image,
           clip.x,
           clip.y,
           clip.width,
@@ -150,7 +166,7 @@ class CanvasRenderContext implements RenderContext {
         );
       }
     } else {
-      context.drawImage(cast js.Browser.document.getElementById(assetId), 0, 0);
+      context.drawImage(image, 0, 0);
     }
     context.setTransform(1, 0, 0, 1, 0, 0);
   }
