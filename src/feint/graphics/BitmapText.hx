@@ -6,9 +6,13 @@ class BitmapText {
   public var text(default, null):String;
   public var font(default, null):BitmapFont;
 
-  public function new(text:String, font:BitmapFont) {
+  public function new(text:String, ?font:BitmapFont) {
     this.text = text;
-    this.font = font;
+    if (font != null) {
+      this.font = font;
+    } else {
+      this.font = DefaultBitmapFont.getFont();
+    }
   }
 
   public function draw(renderer:Renderer, x:Int, y:Int, fontSize:Int) {

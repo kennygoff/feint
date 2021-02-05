@@ -1,5 +1,7 @@
 package feint.renderer.backends;
 
+import haxe.crypto.Base64;
+import feint.assets.macros.AssetEmbed;
 import js.html.CanvasElement;
 import js.html.Image;
 import js.html.ImageElement;
@@ -125,28 +127,46 @@ class WebGLRenderContext implements RenderContext {
   ) {
     var textureInitialized = textures.exists(assetId);
     var textureLoaded = textureInitialized && textures.get(assetId) != null;
+    var textureEmbedded = AssetEmbed.embeddedAssets.exists(assetId);
     if (!textureInitialized) {
-      var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
-      var image = new Image();
-      if (imageElem.src.indexOf('file://') == 0) {
-        throw new FeintException(
-          'INVALID_FILESYSTEM_ACCESS',
-          'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
-        );
-      }
-      requestCORSIfNotSameOrigin(image, imageElem.src);
-      image.src = imageElem.src;
+      if (textureEmbedded) {
+        var image = new Image();
+        var embeddedBytes = AssetEmbed.embeddedAssets.get(assetId);
+        image.src = "data:image/png;base64," + Base64.encode(embeddedBytes);
 
-      // Set texture to null and add to list
-      textures[assetId] = null;
-      textureIndex.push(assetId);
-      // var index = batchRender.prepTexture(context);
-      textureId[assetId] = 0;
-      image.addEventListener('load', () -> {
-        // Set texture to image after it loads
-        textures[assetId] = image;
-        textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
-      });
+        // Set texture to null and add to list
+        textures[assetId] = null;
+        textureIndex.push(assetId);
+        // var index = batchRender.prepTexture(context);
+        textureId[assetId] = 0;
+        image.addEventListener('load', () -> {
+          // Set texture to image after it loads
+          textures[assetId] = image;
+          textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
+        });
+      } else {
+        var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
+        var image = new Image();
+        if (imageElem.src.indexOf('file://') == 0) {
+          throw new FeintException(
+            'INVALID_FILESYSTEM_ACCESS',
+            'Unable to load assets directly from the filesystem in WebGL, you\'ll need to run this application from a dev server or hosted site'
+          );
+        }
+        requestCORSIfNotSameOrigin(image, imageElem.src);
+        image.src = imageElem.src;
+
+        // Set texture to null and add to list
+        textures[assetId] = null;
+        textureIndex.push(assetId);
+        // var index = batchRender.prepTexture(context);
+        textureId[assetId] = 0;
+        image.addEventListener('load', () -> {
+          // Set texture to image after it loads
+          textures[assetId] = image;
+          textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
+        });
+      }
     } else if (textureLoaded) {
       // TODO: Bind texture
     }

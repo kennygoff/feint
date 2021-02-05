@@ -1,5 +1,6 @@
 package scenes;
 
+import feint.graphics.DefaultBitmapFont;
 import feint.graphics.BitmapText;
 import feint.graphics.BitmapFont;
 import library.systems.BackgroundGridRenderSystem;
@@ -26,11 +27,7 @@ class BitmapFontScene extends Scene {
   override function init() {
     super.init();
 
-    bmFont = new BitmapFont(
-      Assets.GenericMobileSystemNuevo__fnt,
-      Assets.GenericMobileSystemNuevo__png
-    );
-    bmText = new BitmapText("Hello, world!\nGoodbye, world!", bmFont);
+    bmText = new BitmapText("Hello, world!\nGoodbye, world!");
 
     // Layers & Cameras
     uiCamera = new Camera();

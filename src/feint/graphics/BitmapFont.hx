@@ -46,8 +46,10 @@ class BitmapFont {
     this.fontAssetId = fontAssetId;
     this.textureAssetId = textureAssetId;
 
-    load();
-    parse();
+    if (fontAssetId != null) {
+      load();
+      parse();
+    }
   }
 
   function load() {
