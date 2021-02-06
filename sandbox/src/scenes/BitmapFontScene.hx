@@ -17,7 +17,6 @@ import feint.library.SpriteAnimationSystem;
 import feint.library.PositionComponent;
 
 class BitmapFontScene extends Scene {
-  var forge:Forge;
   var backgroundCamera:Camera;
   var uiCamera:Camera;
   var rot:Float = 0.0;
@@ -45,7 +44,6 @@ class BitmapFontScene extends Scene {
     playerSprite.animation.play('run', 30, true);
 
     // Forge
-    forge = new Forge();
     forge.createEntity([new PositionComponent(0, 0), new SpriteComponent(playerSprite)]);
     forge.addSystem(new SpriteAnimationSystem());
     forge.addRenderSystems(
@@ -55,8 +53,6 @@ class BitmapFontScene extends Scene {
 
   override function update(elapsed:Float) {
     super.update(elapsed);
-
-    forge.update(elapsed);
 
     if (game.window.inputManager.keyboard.keys[KeyCode.W] == Pressed) {
       camera.translation = {
@@ -105,9 +101,6 @@ class BitmapFontScene extends Scene {
 
   override function render(renderer:Renderer) {
     super.render(renderer);
-
-    renderer.camera = camera;
-    forge.render(renderer);
 
     renderer.camera = camera;
     renderer.drawRect(50, 100, 50, 50, 0, 0x5500FFFF, 1.0, 0.5);

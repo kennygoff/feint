@@ -23,7 +23,6 @@ typedef Rect = {
 }
 
 class SandboxScene extends Scene {
-  var forge:Forge;
   var rects:Array<Rect>;
   var rot:Float = 0;
 
@@ -77,7 +76,6 @@ class SandboxScene extends Scene {
     sprite.setupSpriteSheetAnimation(96, 96, ['idle' => [0], 'jump' => [1], 'run' => [2, 3]]);
     sprite.animation.play('run', 30, true);
 
-    forge = new Forge();
     forge.addEntity(Entity.create(), [
       new PositionComponent(0, 0),
       new HitboxComponent(0, 0, 96, 96),
@@ -89,8 +87,6 @@ class SandboxScene extends Scene {
 
   override function update(elapsed:Float) {
     super.update(elapsed);
-
-    forge.update(elapsed);
 
     rot += elapsed / 3000;
     if (rot >= 2) {
@@ -139,7 +135,6 @@ class SandboxScene extends Scene {
   }
 
   override function render(renderer:Renderer) {
-    super.render(renderer);
     renderer.drawRect(50, 50, 100, 100, 0, 0xFF00FFFF);
     renderer.drawRect(200, 200, 100, 100, 0, 0xFFFF0000);
     for (rect in rects) {
@@ -178,8 +173,6 @@ class SandboxScene extends Scene {
       height: 128
     });
 
-    // renderer.drawText(0, 0, "Sandbox", 32, "sans-serif");
-
-    forge.render(renderer);
+    super.render(renderer);
   }
 }
