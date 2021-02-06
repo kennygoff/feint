@@ -109,7 +109,8 @@ class CanvasRenderContext implements RenderContext {
     textureWidth:Int,
     textureHeight:Int,
     rotation:Float = 0,
-    scale:Float = 1,
+    xScale:Float = 1,
+    yScale:Float = 1,
     color:Int = 0xFFFFFFFF,
     alpha:Float = 1.0,
     depth:Float = 1.0,
@@ -140,7 +141,7 @@ class CanvasRenderContext implements RenderContext {
     context.translate(x, y);
     context.rotate(rotation);
     if (clip != null) {
-      if (scale != null) {
+      if (xScale != null) {
         context.drawImage(
           image,
           clip.x,
@@ -149,8 +150,8 @@ class CanvasRenderContext implements RenderContext {
           clip.height,
           0,
           0,
-          clip.width * scale,
-          clip.height * scale
+          clip.width * xScale,
+          clip.height * yScale
         );
       } else {
         context.drawImage(

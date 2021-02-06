@@ -37,6 +37,7 @@ class BitmapText {
         font.textureHeight,
         0,
         scale,
+        scale,
         0xFFFFFFFF,
         1,
         0.0,

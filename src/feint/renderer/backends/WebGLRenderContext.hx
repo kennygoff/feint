@@ -1,8 +1,5 @@
 package feint.renderer.backends;
 
-import js.node.Querystring;
-import electron.renderer.IpcRenderer;
-import haxe.io.Bytes;
 import haxe.crypto.Base64;
 import feint.assets.macros.AssetEmbed;
 import js.html.CanvasElement;
@@ -13,7 +10,6 @@ import js.html.webgl.RenderingContext;
 import feint.debug.FeintException;
 import feint.renderer.Renderer.TextureClip;
 import feint.renderer.Renderer.TextAlign;
-import feint.renderer.Renderer.RendererPrimitiveOptions;
 import feint.renderer.RenderContext.RenderAPI;
 import feint.renderer.backends.BatchRenderWebGLShader;
 
@@ -122,7 +118,8 @@ class WebGLRenderContext implements RenderContext {
     textureWidth:Int,
     textureHeight:Int,
     rotation:Float = 0,
-    scale:Float = 1,
+    xScale:Float = 1,
+    yScale:Float = 1,
     color:Int = 0xFFFFFFFF,
     alpha:Float = 1.0,
     depth:Float = 1.0,
@@ -162,7 +159,10 @@ class WebGLRenderContext implements RenderContext {
         } else {
           filepath = imageElem.src.substr(7);
         }
-        var base64Image = js.node.Fs.readFileSync(Querystring.unescape(filepath), 'base64');
+        var base64Image = js.node.Fs.readFileSync(
+          js.node.Querystring.unescape(filepath),
+          'base64'
+        );
         image.src = "data:image/png;base64," + base64Image;
         image.addEventListener('load', () -> {
           textures[assetId] = image;
@@ -198,8 +198,8 @@ class WebGLRenderContext implements RenderContext {
       batchRender.addClipRect(
         x,
         y,
-        clip.width * scale,
-        clip.height * scale,
+        clip.width * xScale,
+        clip.height * yScale,
         clip.x / textureWidth,
         (clip.x + clip.width) / textureWidth,
         clip.y / textureHeight,
@@ -214,8 +214,8 @@ class WebGLRenderContext implements RenderContext {
       batchRender.addRect(
         x,
         y,
-        clip.width * scale,
-        clip.height * scale,
+        clip.width * xScale,
+        clip.height * yScale,
         color,
         rotation,
         alpha,

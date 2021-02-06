@@ -43,7 +43,7 @@ class Sprite {
     animation = new SpriteAnimation(frames, animationMap);
   }
 
-  public function drawAt(x:Int, y:Int, renderer:Renderer, ?scale:Float) {
+  public function drawAt(x:Int, y:Int, renderer:Renderer, scale:Float = 1) {
     if (animation != null) {
       renderer.drawImage(
         x,
@@ -52,6 +52,7 @@ class Sprite {
         textureWidth,
         textureHeight,
         0,
+        scale,
         scale,
         0xFFFFFFFF,
         1.0,
@@ -66,6 +67,7 @@ class Sprite {
         textureWidth,
         textureHeight,
         0,
+        scale,
         scale,
         0xFFFFFFFF,
         1.0,
