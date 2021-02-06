@@ -156,9 +156,12 @@ class WebGLRenderContext implements RenderContext {
         textureIndex.push(assetId);
         textureId[assetId] = 0;
 
-        var filepath = imageElem.src.indexOf(
-          'file://'
-        ) == 0 ? imageElem.src.substr(7) : imageElem.src;
+        var filepath = imageElem.src;
+        if (js.Node.process.platform.substr(0, 3) == 'win') {
+          filepath = imageElem.src.substr(8);
+        } else {
+          filepath = imageElem.src.substr(7);
+        }
         var base64Image = js.node.Fs.readFileSync(Querystring.unescape(filepath), 'base64');
         image.src = "data:image/png;base64," + base64Image;
         image.addEventListener('load', () -> {

@@ -1,7 +1,5 @@
 package feint.system;
 
-import electron.main.WebContents;
-import electron.main.IpcMain;
 import feint.assets.macros.ApplicationSettings;
 import js.Node;
 import js.Node.__dirname;
@@ -20,6 +18,7 @@ class FeintElectron {
           nodeIntegration: true
         }
       });
+      win.removeMenu();
       win.on(closed, function() {
         win = null;
       });

@@ -123,6 +123,7 @@ class AssetBuilder {
           ::end::
           padding: 0;
           margin: 0;
+          overflow: hidden;
         }
         canvas {
           display: block;
