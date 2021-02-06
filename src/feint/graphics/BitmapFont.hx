@@ -119,8 +119,6 @@ class BitmapFont {
           };
         case "spacing":
           var spaces = value.split(",");
-          trace(value);
-          trace(spaces);
           spacing = {
             horizontal: Std.parseInt(spaces[0]),
             vertical: Std.parseInt(spaces[1]),

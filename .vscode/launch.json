@@ -18,6 +18,54 @@
       "webRoot": "${workspaceFolder}/sandbox/build/web",
       "preLaunchTask": "[Feint] Sandbox Server",
       "postDebugTask": "[Feint] Kill Task"
+    },
+    {
+      "name": "[Feint] Sandbox Electron Debugger (Renderer)",
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "runtimeArgs": [
+        "${workspaceRoot}/sandbox/build/electron/feint-electron.js",
+        "--remote-debugging-port=9222"
+      ],
+      "webRoot": "${workspaceRoot}/sandbox/build/electron",
+      "preLaunchTask": "[Feint] Build Sandbox Electron"
+    },
+    {
+      "name": "[Feint] Sandbox Electron Debugger (Main)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "runtimeArgs": [
+        "${workspaceRoot}/sandbox/build/electron/feint-electron.js",
+        "--remote-debugging-port=9223"
+      ],
+      "protocol": "inspector",
+      "preLaunchTask": "[Feint] Build Sandbox Electron"
+    },
+    {
+      "name": "[Feint] Sandbox Electron Debugger (Renderer Attach)",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9223,
+      "webRoot": "${workspaceRoot}/sandbox/build/electron",
+      "timeout": 30000
+    }
+  ],
+  "compounds": [
+    {
+      "name": "[Feint] Sandbox Electron Debugger",
+      "configurations": [
+        "[Feint] Sandbox Electron Debugger (Main)",
+        "[Feint] Sandbox Electron Debugger (Renderer Attach)"
+      ]
     }
   ]
 }
