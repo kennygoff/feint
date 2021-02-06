@@ -1,5 +1,7 @@
 package feint.renderer.backends;
 
+import electron.renderer.IpcRenderer;
+import haxe.io.Bytes;
 import haxe.crypto.Base64;
 import feint.assets.macros.AssetEmbed;
 import js.html.CanvasElement;
@@ -147,6 +149,22 @@ class WebGLRenderContext implements RenderContext {
       } else {
         var imageElem:ImageElement = cast js.Browser.document.getElementById(assetId);
         var image = new Image();
+        #if electron
+        // Set texture to null and add to list
+        textures[assetId] = null;
+        textureIndex.push(assetId);
+        textureId[assetId] = 0;
+
+        var filepath = imageElem.src.indexOf(
+          'file://'
+        ) == 0 ? imageElem.src.substr(7) : imageElem.src;
+        var base64Image = js.node.Fs.readFileSync(filepath, 'base64');
+        image.src = "data:image/png;base64," + base64Image;
+        image.addEventListener('load', () -> {
+          textures[assetId] = image;
+          textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
+        });
+        #else
         if (imageElem.src.indexOf('file://') == 0) {
           throw new FeintException(
             'INVALID_FILESYSTEM_ACCESS',
@@ -166,6 +184,7 @@ class WebGLRenderContext implements RenderContext {
           textures[assetId] = image;
           textureId[assetId] = batchRender.bindTexture(context, textures[assetId]);
         });
+        #end
       }
     } else if (textureLoaded) {
       // TODO: Bind texture

@@ -1,5 +1,7 @@
 package feint.system;
 
+import electron.main.WebContents;
+import electron.main.IpcMain;
 import feint.assets.macros.ApplicationSettings;
 import js.Node;
 import js.Node.__dirname;
@@ -15,7 +17,7 @@ class FeintElectron {
         useContentSize: true,
         resizable: false,
         webPreferences: {
-          nodeIntegration: false
+          nodeIntegration: true
         }
       });
       win.on(closed, function() {
@@ -25,7 +27,7 @@ class FeintElectron {
       // win.webContents.openDevTools();
 
       trace(__dirname);
-      var tray = new electron.main.Tray('${__dirname}/icon-192.png');
+      // var tray = new electron.main.Tray('${__dirname}/icon-192.png');
     });
 
     electron.main.App.on(window_all_closed, function(e) {
