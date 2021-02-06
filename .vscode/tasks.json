@@ -3,6 +3,11 @@
   "tasks": [
     {
       "type": "npm",
+      "script": "sandbox:electron:build",
+      "label": "[Feint] Build Sandbox Electron"
+    },
+    {
+      "type": "npm",
       "script": "sandbox",
       "label": "[Feint] Build Sandbox"
     },

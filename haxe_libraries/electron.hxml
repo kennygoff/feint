@@ -1,0 +1,4 @@
+# @install: lix --silent download "gh://github.com/tong/hxelectron#b42d68425ad8dc59ad64a09395456f6f9c9766d4" into electron/11.2.1/github/b42d68425ad8dc59ad64a09395456f6f9c9766d4
+-lib hxnodejs
+-cp ${HAXE_LIBCACHE}/electron/11.2.1/github/b42d68425ad8dc59ad64a09395456f6f9c9766d4/src
+-D electron=11.2.1

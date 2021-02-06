@@ -18,6 +18,19 @@
       "webRoot": "${workspaceFolder}/sandbox/build/web",
       "preLaunchTask": "[Feint] Sandbox Server",
       "postDebugTask": "[Feint] Kill Task"
+    },
+    {
+      "name": "[Feint] Sandbox Electron Debugger",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
+      },
+      "args": ["sandbox/build/electron/feint-electron.js"],
+      "outputCapture": "std",
+      "preLaunchTask": "[Feint] Build Sandbox Electron"
     }
   ]
 }

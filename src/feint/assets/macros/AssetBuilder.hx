@@ -15,17 +15,22 @@ import sys.io.File;
  * @see https://blog.hamaluik.ca/posts/getting-started-with-haxe-macros/
  */
 class AssetBuilder {
-  public static function buildWeb() {
-    final assets = copyAssets();
-    generateHtml(assets);
+  public static function buildElectron() {
+    final assets = copyAssets("build/electron");
+    generateHtml("build/electron", assets);
   }
 
-  public static function copyAssets():Array<String> {
+  public static function buildWeb() {
+    final assets = copyAssets("build/web");
+    generateHtml("build/web", assets);
+  }
+
+  public static function copyAssets(buildFolder:String):Array<String> {
     final clean = Context.defined("feint:clean");
     final projectRoot = Context.definedValue("feint:projectRoot");
     final cwd:String = Sys.getCwd();
     final assetSrcFolder = Path.join([cwd, projectRoot, "src", "assets"]);
-    final assetsDstFolder = Path.join([cwd, projectRoot, "build/web", "assets"]);
+    final assetsDstFolder = Path.join([cwd, projectRoot, buildFolder, "assets"]);
 
     Sys.println("\033[1m\033[38;5;6m[Feint]\033[m \033[38;5;6mAsset Builder running...\033[m");
 
@@ -108,6 +113,10 @@ class AssetBuilder {
             font-style: normal;
           }
         ::end::
+        html {
+          padding: 0;
+          margin: 0;
+        }
         body {
           ::foreach webFonts::
             font-family: "::name::";
@@ -116,6 +125,7 @@ class AssetBuilder {
           margin: 0;
         }
         canvas {
+          display: block;
           font-smooth: never;
           -webkit-font-smoothing: none;
         }
@@ -155,12 +165,12 @@ class AssetBuilder {
     "fnt" => "bitmapfont"
   ];
 
-  public static function generateHtml(assetPaths:Array<String>) {
+  public static function generateHtml(buildFolder:String, assetPaths:Array<String>) {
     final projectRoot = Context.definedValue("feint:projectRoot");
     final cwd:String = Sys.getCwd();
     final assetSrcFolder = Path.join([cwd, projectRoot, "src", "assets"]);
-    final assetsDstFolder = Path.join([cwd, projectRoot, "build/web", "assets"]);
-    final buildWebFolder = Path.join([cwd, projectRoot, "build/web"]);
+    final assetsDstFolder = Path.join([cwd, projectRoot, buildFolder, "assets"]);
+    final buildWebFolder = Path.join([cwd, projectRoot, buildFolder]);
     var appTitle = Context.definedValue("feint:appTitle");
     if (appTitle == null) {
       appTitle = 'Feint Engine';

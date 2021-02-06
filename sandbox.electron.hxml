@@ -1,0 +1,20 @@
+--class-path src
+--class-path sandbox/src
+-D feint:clean
+-D feint:projectRoot=sandbox
+-D feint:appTitle=Feint Sandbox
+--macro feint.assets.macros.AssetBuilder.buildElectron()
+--js sandbox/build/electron/bin/main.js
+--main Sandbox
+-lib electron
+--debug
+
+--next
+
+--class-path src
+-D feint:appWidth=640
+-D feint:appHeight=360
+-js sandbox/build/electron/feint-electron.js
+-main feint.system.FeintElectron
+-lib electron
+--debug
