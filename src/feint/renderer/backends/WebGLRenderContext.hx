@@ -1,5 +1,6 @@
 package feint.renderer.backends;
 
+import js.node.Querystring;
 import electron.renderer.IpcRenderer;
 import haxe.io.Bytes;
 import haxe.crypto.Base64;
@@ -158,7 +159,7 @@ class WebGLRenderContext implements RenderContext {
         var filepath = imageElem.src.indexOf(
           'file://'
         ) == 0 ? imageElem.src.substr(7) : imageElem.src;
-        var base64Image = js.node.Fs.readFileSync(filepath, 'base64');
+        var base64Image = js.node.Fs.readFileSync(Querystring.unescape(filepath), 'base64');
         image.src = "data:image/png;base64," + base64Image;
         image.addEventListener('load', () -> {
           textures[assetId] = image;

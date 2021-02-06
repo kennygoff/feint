@@ -18,13 +18,15 @@
     "sandbox:watch": "haxe sandbox.build.hxml && fswatch -o src sandbox/src | xargs -n1 -I{} haxe sandbox.build.hxml",
     "sandbox:serve": "parcel sandbox/build/web/index.html -d sandbox/build/web/parcel/output --cache-dir sandbox/build/web/parcel/cache",
     "sandbox:electron:build": "haxe sandbox.electron.hxml",
-    "sandbox:electron:start": "electron sandbox/build/electron/feint-electron.js"
+    "sandbox:electron:start": "electron sandbox/build/electron/feint-electron.js",
+    "sandbox:electron:package": "electron-packager sandbox/build/electron \"Feint Sandbox\" --all --overwrite --out=sandbox/build/electron-release"
   },
   "dependencies": {},
   "devDependencies": {
     "browser-sync": "^2.26.13",
     "concurrently": "^5.3.0",
     "electron": "^11.2.1",
+    "electron-packager": "^15.2.0",
     "lix": "^15.9.1",
     "parcel-bundler": "^1.12.4"
   }
