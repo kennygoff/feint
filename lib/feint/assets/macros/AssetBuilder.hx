@@ -29,7 +29,7 @@ class AssetBuilder {
     final clean = Context.defined("feint:clean");
     final projectRoot = Context.definedValue("feint:projectRoot");
     final cwd:String = Sys.getCwd();
-    final assetSrcFolder = Path.join([cwd, projectRoot, "src", "assets"]);
+    final assetSrcFolder = Path.join([cwd, projectRoot, "assets"]);
     final assetsDstFolder = Path.join([cwd, projectRoot, buildFolder, "assets"]);
 
     Sys.println("\033[1m\033[38;5;6m[Feint]\033[m \033[38;5;6mAsset Builder running...\033[m");
@@ -169,7 +169,7 @@ class AssetBuilder {
   public static function generateHtml(buildFolder:String, assetPaths:Array<String>) {
     final projectRoot = Context.definedValue("feint:projectRoot");
     final cwd:String = Sys.getCwd();
-    final assetSrcFolder = Path.join([cwd, projectRoot, "src", "assets"]);
+    final assetSrcFolder = Path.join([cwd, projectRoot, "assets"]);
     final assetsDstFolder = Path.join([cwd, projectRoot, buildFolder, "assets"]);
     final buildWebFolder = Path.join([cwd, projectRoot, buildFolder]);
     var appTitle = Context.definedValue("feint:appTitle");

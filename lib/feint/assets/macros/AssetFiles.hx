@@ -14,7 +14,7 @@ class AssetFiles {
     var fields:Array<Field> = Context.getBuildFields();
 
     var projectRoot = Context.definedValue("feint:projectRoot");
-    var assetSrcFolder = Path.join([Sys.getCwd(), projectRoot, "src", "assets"]);
+    var assetSrcFolder = Path.join([Sys.getCwd(), projectRoot, "assets"]);
     var files:Array<String> = listFiles(assetSrcFolder);
 
     for (file in files) {

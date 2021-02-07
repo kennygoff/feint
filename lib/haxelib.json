@@ -7,6 +7,6 @@
   "version": "0.2.0",
   "releasenote": "WebGL Renderer, Forge shapes, HTML5 Debugging",
   "contributors": ["Kenny"],
-  "classPath": "src",
+  "classPath": ".",
   "dependencies": {}
 }
