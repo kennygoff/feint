@@ -10,6 +10,21 @@
       "preLaunchTask": "[Feint] Build Sandbox"
     },
     {
+      "name": "Feint Engine",
+      "type": "chrome",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "runtimeArgs": [
+        "${workspaceRoot}/editor/build/electron/feint-electron.js",
+        "--remote-debugging-port=9222"
+      ],
+      "webRoot": "${workspaceRoot}/editor/build/electron",
+      "preLaunchTask": "[Feint] Build Editor"
+    },
+    {
       "name": "[Feint] Sandbox Chrome Debugger",
       "type": "chrome",
       "request": "launch",

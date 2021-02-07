@@ -1,0 +1,39 @@
+.dockspace {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  background-color: #222222;
+  color: #f0f0f0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 2px;
+  border: 1px solid #111111;
+  background-color: #333333;
+}
+.panel h2 {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 4px 8px;
+  margin: 0;
+  background-color: #444444;
+}
+.panel label span {
+  font-size: 14px;
+  padding: 4px;
+}
+
+#feint-editor-viewport {
+  width: 640px;
+  height: 360px;
+  background-color: #000000;
+}

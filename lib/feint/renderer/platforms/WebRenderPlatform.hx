@@ -64,6 +64,17 @@ class WebRenderPlatform {
   }
 
   static function createCanvasElement(width:Int, height:Int):CanvasElement {
+    // TODO: Temp for editor viewport
+    var editorViewportCanvas:CanvasElement = cast(js.Browser.document.getElementById(
+      'feint-editor-viewport'
+    ), CanvasElement);
+    if (editorViewportCanvas != null) {
+      editorViewportCanvas.width = Std.int(width);
+      editorViewportCanvas.height = Std.int(height);
+      editorViewportCanvas.textContent = '[Feint] This browser is not supported';
+      return editorViewportCanvas;
+    }
+
     var canvas = js.Browser.document.createCanvasElement();
     canvas.id = 'feint';
     canvas.width = Std.int(width);

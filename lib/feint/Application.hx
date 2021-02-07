@@ -35,6 +35,8 @@ typedef ApplicationSettings = {
    * JS target defaults to `RenderAPI.WebGL`.
    */
   var ?api:RenderAPI;
+
+  var ?noDefaultRenderer:Bool;
 }
 
 /**
@@ -60,6 +62,8 @@ typedef ApplicationSettings = {
  * ```
  */
 class Application {
+  var settings:ApplicationSettings;
+
   /**
    * Main window of the application, created on startup.
    *
@@ -136,7 +140,8 @@ class Application {
     }
 
     Logger.info('Application starting...');
-    setup(settings);
+    this.settings = settings;
+    setup();
     init();
     start();
   }
@@ -161,12 +166,25 @@ class Application {
    * Initial setup of application `Window`, `renderer.Renderer`, and `Game`.
    *
    * **WARNING:** Do not override, used internally by Application only.
-   * @param settings Settings used by Application to startup application and window
    */
-  function setup(settings:ApplicationSettings) {
+  function setup() {
+    if (settings.noDefaultRenderer == null || settings.noDefaultRenderer == false) {
+      window = new Window(settings.title, settings.size.width, settings.size.height, settings.api);
+      renderer = new Renderer(window.renderContext);
+    }
+    game = new Game(renderer, window);
+    @:privateAccess(Game)
+    game.application = this;
+  }
+
+  function setupRenderer(settings:ApplicationSettings) {
     window = new Window(settings.title, settings.size.width, settings.size.height, settings.api);
     renderer = new Renderer(window.renderContext);
-    game = new Game(renderer, window);
+
+    @:privateAccess(Game)
+    game.renderer = renderer;
+    @:privateAccess(Game)
+    game.window = window;
     @:privateAccess(Game)
     game.application = this;
   }

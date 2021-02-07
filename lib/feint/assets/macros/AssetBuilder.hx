@@ -136,10 +136,15 @@ class AssetBuilder {
           top: 0;
           left: 0;
           background: transparent;
-          z-index: 2; /*  */
+          z-index: 4; /*  */
         }
         ::end::
       </style>
+      ::foreach preloadedAssets::
+        ::if (type == "css")::
+          <link rel="stylesheet" type="text/css" href="::relativePath::">
+        ::end::
+      ::end::
     </head>
     <body>
       ::foreach preloadedAssets::
@@ -163,7 +168,8 @@ class AssetBuilder {
     "woff2" => "font",
     "ttf" => "font",
     "ogg" => "audio",
-    "fnt" => "bitmapfont"
+    "fnt" => "bitmapfont",
+    "css" => "css"
   ];
 
   public static function generateHtml(buildFolder:String, assetPaths:Array<String>) {

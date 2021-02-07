@@ -16,7 +16,8 @@ class FeintEditor extends Application {
         width: config.window.width,
         height: config.window.height
       },
-      api: WebGL
+      api: WebGL,
+      noDefaultRenderer: true
     });
   }
 }

@@ -118,8 +118,10 @@ class Game {
     }
 
     #if debug
-    if (window.inputManager.keyboard.keys[KeyCode.Backtick] == JustPressed) {
-      showDebugUI = !showDebugUI;
+    if (window != null) {
+      if (window.inputManager.keyboard.keys[KeyCode.Backtick] == JustPressed) {
+        showDebugUI = !showDebugUI;
+      }
     }
     frameUpdateTime = Date.now().getTime() - updateTime;
     #end
@@ -134,6 +136,10 @@ class Game {
    * 2. Call render for `Game.activeScene`
    */
   public function render() {
+    if (renderer == null) {
+      return;
+    }
+
     #if debug
     var renderTime = Date.now().getTime();
     #end
