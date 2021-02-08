@@ -13,7 +13,6 @@ import feint.scene.Scene;
 
 class SceneEditor extends Scene {
   var project:ApplicationConfig;
-  var title:BitmapText;
   var dockspace:Dockspace;
   var scenePanel:Panel;
   var viewportPanel:Panel;
@@ -22,16 +21,12 @@ class SceneEditor extends Scene {
   override function init() {
     super.init();
 
-    title = new BitmapText('No Scene Loaded');
-
     project = Json.parse(
       Fs.readFileSync(
         Path.join(js.Node.process.cwd(), '../../..', 'sandbox', 'feint.config.json'),
         'utf-8'
       )
     );
-
-    title = new BitmapText(project.title);
 
     dockspace = new Dockspace();
     scenePanel = new Panel('Scene', {}, []);
@@ -62,12 +57,5 @@ class SceneEditor extends Scene {
       },
       api: WebGL,
     });
-  }
-
-  override function render(renderer:Renderer) {
-    super.render(renderer);
-
-    title.draw(renderer, 4, 4, 16);
-    renderer.submit();
   }
 }
