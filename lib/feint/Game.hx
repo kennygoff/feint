@@ -1,5 +1,7 @@
 package feint;
 
+import feint.renderer.Camera;
+import feint.graphics.BitmapText;
 import feint.input.device.Keyboard.KeyCode;
 import feint.renderer.backends.WebGLRenderContext;
 import feint.debug.Logger;
@@ -70,6 +72,8 @@ class Game {
    */
   var showDebugUI:Bool = false;
 
+  var debugCamera:Camera;
+
   /**
    * Renderer used in the render call every frame, attached to the window's
    * `renderer.RenderContext`.
@@ -86,6 +90,7 @@ class Game {
   public function new(renderer:Renderer, window:Window) {
     this.renderer = renderer;
     this.window = window;
+    this.debugCamera = new Camera();
   }
 
   /**
@@ -174,19 +179,12 @@ class Game {
     #if debug
     // TODO: Move to debug UI
     if (showDebugUI) {
-      renderer.camera = null;
-      @:privateAccess(Renderer)
-      if (renderer.renderContext.api == WebGL) {
-        var webGLRenderContext:WebGLRenderContext = cast renderer.renderContext;
-        @:privateAccess(WebGLRenderContext)
-        webGLRenderContext.textRenderContext.drawRect(4, 4, 130, 62, 0, 0xBB000000);
-      } else {
-        renderer.drawRect(4, 4, 130, 62, 0, 0xBB000000);
-      }
-
-      renderer.drawText(8, 8 + 2, 'FPS: ${fps}', 16, 'sans-serif');
-      renderer.drawText(8, 8 + 2 + (18 * 1), 'Update: ${frameUpdateTime}ms', 16, 'sans-serif');
-      renderer.drawText(8, 8 + 2 + (18 * 2), 'Render: ${frameRenderTime}ms', 16, 'sans-serif');
+      renderer.camera = debugCamera;
+      renderer.drawRect(4, 4, 130, 62, 0, 0xBB000000, 1.0, 0.0);
+      new BitmapText('FPS: ${fps}').draw(renderer, 8, 8 + 2, 16);
+      new BitmapText('Update: ${frameUpdateTime}ms').draw(renderer, 8, 8 + 2 + (18 * 1), 16);
+      new BitmapText('Render: ${frameRenderTime}ms').draw(renderer, 8, 8 + 2 + (18 * 2), 16);
+      renderer.submit();
     }
     #end
   }

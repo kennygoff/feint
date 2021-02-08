@@ -136,7 +136,7 @@ class AssetBuilder {
           top: 0;
           left: 0;
           background: transparent;
-          z-index: 4; /*  */
+          z-index: 2; /*  */
         }
         ::end::
       </style>

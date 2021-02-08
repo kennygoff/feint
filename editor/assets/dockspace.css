@@ -27,9 +27,19 @@
   margin: 0;
   background-color: #444444;
 }
-.panel label span {
+
+.panel form {
+  display: grid;
+  grid-template-columns: [label] 0fr [input] auto;
+  padding: 8px;
+}
+.panel label {
+  text-align: right;
   font-size: 14px;
   padding: 4px;
+}
+.panel input {
+  margin: 2px;
 }
 
 #feint-editor-viewport {

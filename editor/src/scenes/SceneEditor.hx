@@ -42,14 +42,15 @@ class SceneEditor extends Scene {
     );
     projectPanel = new Panel('Project', {project: project}, [
       (props : {project:ApplicationConfig})
-    -> '<label><span>Title</span> <input type="text" value="${props.project.title}" /></label>',
+    -> '<label for="project-title">Title</label>
+        <input id="project-title" name="project-title" type="text" value="${props.project.title}" />',
       (props : {project:ApplicationConfig})
-    ->
-        '<label><span>Width</span> <input type="number" value="${props.project.window.width}" /></label>',
+    -> '<label for="project-width">Width</label>
+        <input id="project-width" name="project-width" type="number" min="0" value="${props.project.window.width}" />',
       (props : {project:ApplicationConfig})
-    ->
-        '<label><span>Height</span> <input type="number" value="${props.project.window.height}" /></label>'
-    ]);
+    -> '<label for="project-height">Height</label>
+        <input id="project-height" name="project-height" type="number" min="0" value="${props.project.window.height}" />',
+    ], 'form');
     dockspace.add([scenePanel, viewportPanel, projectPanel]);
 
     @:privateAccess(feint.Application)
