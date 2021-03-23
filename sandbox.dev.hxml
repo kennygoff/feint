@@ -1,4 +1,4 @@
---class-path src
+--class-path lib
 --class-path sandbox/src
 -D feint:projectRoot=sandbox
 -D feint:appTitle=Feint Sandbox

@@ -1,0 +1,21 @@
+# Editor Application
+--class-path ../lib
+--class-path src
+-D feint:clean
+-D feint:appTitle=Feint Engine
+--macro feint.assets.macros.AssetBuilder.buildElectron()
+--js build/electron/bin/main.js
+--main FeintEditor
+-lib electron
+--debug
+
+--next
+
+# Editor Electron Wrapper
+--class-path ../lib
+-D feint:appWidth=1280
+-D feint:appHeight=720
+-js build/electron/feint-electron.js
+-main feint.system.FeintElectron
+-lib electron
+--debug

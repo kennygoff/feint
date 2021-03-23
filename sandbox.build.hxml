@@ -1,4 +1,4 @@
---class-path src
+--class-path lib
 --class-path sandbox/src
 -D feint:clean
 -D feint:projectRoot=sandbox

@@ -1,22 +1,23 @@
 package;
 
-import feint.assets.macros.ApplicationSettings.ApplicationConfig;
 import feint.Application;
+import feint.assets.macros.ApplicationSettings.ApplicationConfig;
 
-class Sandbox extends Application {
+class FeintEditor extends Application {
   override public function init() {
-    game.setInitialScene(new scenes.BitmapFontScene());
+    game.setInitialScene(new scenes.SceneEditor());
   }
 
   static public function main() {
     var config:ApplicationConfig = feint.assets.macros.ApplicationSettings.getApplicationConfig();
-    new Sandbox({
+    new FeintEditor({
       title: config.title,
       size: {
         width: config.window.width,
         height: config.window.height
       },
-      api: WebGL
+      api: WebGL,
+      noDefaultRenderer: true
     });
   }
 }

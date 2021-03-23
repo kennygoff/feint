@@ -19,7 +19,8 @@
     "sandbox:serve": "parcel sandbox/build/web/index.html -d sandbox/build/web/parcel/output --cache-dir sandbox/build/web/parcel/cache",
     "sandbox:electron:build": "haxe sandbox.electron.hxml",
     "sandbox:electron:start": "electron sandbox/build/electron/feint-electron.js",
-    "sandbox:electron:package": "electron-packager sandbox/build/electron \"Feint Sandbox\" --all --overwrite --out=sandbox/build/electron-release"
+    "sandbox:electron:package": "electron-packager sandbox/build/electron \"Feint Sandbox\" --all --overwrite --out=sandbox/build/electron-release",
+    "editor": "haxe editor.hxml"
   },
   "dependencies": {},
   "devDependencies": {

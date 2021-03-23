@@ -13,6 +13,11 @@
     },
     {
       "type": "npm",
+      "script": "editor",
+      "label": "[Feint] Build Editor"
+    },
+    {
+      "type": "npm",
       "script": "sandbox:debug",
       "isBackground": true,
       "label": "[Feint] Sandbox Server",

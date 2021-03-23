@@ -1,0 +1,9 @@
+# Editor Application
+--class-path ../lib
+--class-path src
+-D feint:clean
+-D feint:appTitle=Feint Engine
+--js build/electron/bin/main.js
+--main FeintEditor
+-lib electron
+--debug

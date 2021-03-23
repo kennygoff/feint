@@ -1,3 +1,3 @@
---class-path src
+--class-path lib
 --js bin/feint.js
 --debug

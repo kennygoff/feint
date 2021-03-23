@@ -1,4 +1,4 @@
---class-path src
+--class-path lib
 --class-path sandbox/src
 -D feint:clean
 -D feint:projectRoot=sandbox
@@ -11,7 +11,7 @@
 
 --next
 
---class-path src
+--class-path lib
 -D feint:appWidth=640
 -D feint:appHeight=360
 -js sandbox/build/electron/feint-electron.js
