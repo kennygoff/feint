@@ -21,11 +21,7 @@ class SpriteRenderSystem extends RenderSystem {
     var visibleSprites = sprites.filter(sprite -> sprite.sprite.sprite.alpha > 0);
 
     for (sprite in visibleSprites) {
-      sprite.sprite.sprite.drawAt(
-        Math.floor(sprite.position.x),
-        Math.floor(sprite.position.y),
-        renderer
-      );
+      sprite.sprite.sprite.drawAt(sprite.position.x, sprite.position.y, renderer);
     }
   }
 }

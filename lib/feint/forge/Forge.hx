@@ -179,9 +179,12 @@ class Forge {
     renderSystems.push(system);
   }
 
-  public function getShapes(componentClassNames:Array<ComponentType>):Array<Dynamic> {
+  public function getShapes(
+    componentClassNames:Array<ComponentType>,
+    ?labels:Array<String>
+  ):Array<Dynamic> {
     var entities = this.getEntities(componentClassNames);
-    return entities.map(entityId -> {
+    var matchingEntities = entities.map(entityId -> {
       var object:Dynamic = {
         id: entityId
       };
@@ -197,6 +200,14 @@ class Forge {
       }
       return object;
     });
+
+    if (labels != null) {
+      matchingEntities = matchingEntities.filter(
+        entity -> labels.foreach(label -> entityLabels[entity.id].contains(label))
+      );
+    }
+
+    return matchingEntities;
   }
 
   public function destroy() {

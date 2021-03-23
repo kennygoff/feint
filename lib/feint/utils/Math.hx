@@ -7,6 +7,8 @@ import haxe.ds.Either;
  * Utility class that contains various static math functions.
  */
 class Math {
+  public static final EPSILON:Float = 1e-8;
+
   /**
    * Clamp a Float to be between a given range of values.
    * @param num Number to clamp
@@ -52,6 +54,10 @@ class Math {
           return cast f;
         }
     }
+  }
+
+  public static function sign(value:Float):Float {
+    return value < 0 ? -1 : 1;
   }
 
   #if js

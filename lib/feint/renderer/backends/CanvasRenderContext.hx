@@ -88,6 +88,7 @@ class CanvasRenderContext implements RenderContext {
         camera.translation.x,
         camera.translation.y
       );
+      context.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
       context.rotate(camera.rotation);
     }
     // context.lineWidth = strokeWidth;
@@ -100,11 +101,12 @@ class CanvasRenderContext implements RenderContext {
     context.fillRect(0, 0, width, height);
     // context.strokeRect(0, 0, width, height);
     context.setTransform(1, 0, 0, 1, 0, 0);
+    context.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
   }
 
   public function drawImage(
-    x:Int,
-    y:Int,
+    x:Float,
+    y:Float,
     assetId:String,
     textureWidth:Int,
     textureHeight:Int,
@@ -125,6 +127,7 @@ class CanvasRenderContext implements RenderContext {
         camera.translation.x,
         camera.translation.y
       );
+      context.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
       context.rotate(camera.rotation);
     }
 
@@ -170,6 +173,7 @@ class CanvasRenderContext implements RenderContext {
       context.drawImage(image, 0, 0);
     }
     context.setTransform(1, 0, 0, 1, 0, 0);
+    context.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
   }
 
   public function drawText(x:Int, y:Int, text:String, fontSize:Int, font:String, align:TextAlign) {
@@ -182,6 +186,7 @@ class CanvasRenderContext implements RenderContext {
         camera.translation.x,
         camera.translation.y
       );
+      context.scale(js.Browser.window.devicePixelRatio, js.Browser.window.devicePixelRatio);
       context.rotate(2 * Math.PI - camera.rotation);
     }
 

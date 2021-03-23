@@ -32,8 +32,8 @@ interface RenderContext {
     depth:Float = 1.0
   ):Void;
   public function drawImage(
-    x:Int,
-    y:Int,
+    x:Float,
+    y:Float,
     assetId:String,
     textureWidth:Int,
     textureHeight:Int,

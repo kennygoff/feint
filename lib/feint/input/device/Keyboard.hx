@@ -47,6 +47,7 @@ enum abstract KeyCode(Int) from Int {
   var Y = KeyboardEvent.DOM_VK_Y;
   var Z = KeyboardEvent.DOM_VK_Z;
   var Backtick = KeyboardEvent.DOM_VK_BACK_QUOTE;
+  var Escape = KeyboardEvent.DOM_VK_ESCAPE;
 }
 
 enum KeyEvent {

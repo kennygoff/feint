@@ -112,8 +112,8 @@ class WebGLRenderContext implements RenderContext {
   }
 
   public function drawImage(
-    x:Int,
-    y:Int,
+    x:Float,
+    y:Float,
     assetId:String,
     textureWidth:Int,
     textureHeight:Int,

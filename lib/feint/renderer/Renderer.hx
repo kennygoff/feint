@@ -121,8 +121,8 @@ class Renderer {
    * `submit()`. For Canvas on the js target, this draws immediately.
    */
   public function drawImage(
-    x:Int,
-    y:Int,
+    x:Float,
+    y:Float,
     assetId:String,
     textureWidth:Int,
     textureHeight:Int,

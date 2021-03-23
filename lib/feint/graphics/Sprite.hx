@@ -43,7 +43,40 @@ class Sprite {
     animation = new SpriteAnimation(frames, animationMap);
   }
 
-  public function drawAt(x:Int, y:Int, renderer:Renderer, scale:Float = 1) {
+  public function drawTileAt(
+    x:Float,
+    y:Float,
+    gridWidth:Int,
+    gridHeight:Int,
+    tileId:Int,
+    renderer:Renderer,
+    scale:Float = 1
+  ) {
+    var tileWidth = Math.floor(textureWidth / gridWidth);
+    var tileHeight = Math.floor(textureHeight / gridHeight);
+
+    renderer.drawImage(
+      x,
+      y,
+      assetId,
+      textureWidth,
+      textureHeight,
+      0,
+      scale,
+      scale,
+      0xFFFFFFFF,
+      1.0,
+      0.5,
+      {
+        x: Math.floor((tileId % gridWidth) * tileWidth),
+        y: Math.floor(Math.floor(tileId / gridHeight) * tileHeight),
+        width: tileWidth,
+        height: tileHeight
+      }
+    );
+  }
+
+  public function drawAt(x:Float, y:Float, renderer:Renderer, scale:Float = 1) {
     if (animation != null) {
       renderer.drawImage(
         x,
