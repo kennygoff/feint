@@ -2,6 +2,13 @@
 
 A game engine for crafting 2D games in Haxe
 
+> ⚠️ Not ready for production, this was created as a learning and exploration project
+
+## Sample games
+
+- Sample projects w/ code: [feint-samples](https://github.com/kennygoff/feint-samples)
+- Micro Shooter mini-game: https://kennygoff.itch.io/micro-shooter
+
 ## Forge ECS
 
 ### Defining Components
